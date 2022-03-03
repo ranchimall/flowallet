@@ -255,6 +255,11 @@
                 <button class="button button--primary" onclick="showPage('sendDataBtn', 'send')">Done</button>
             </div>
             <div id="settings" class="page hide">
+                <h3>Settings</h3>
+                <section class="grid gap-1">
+                    <h4>Accent color</h4>
+                    <color-grid id="accent_color_selector"></color-grid>
+                </section>
                 <section id="deleteDB" class="grid gap-0-5">
                     <h4>Clear all local data</h4>
                     <p>This will delete all local Web Wallet data like added addresses and locally stored
@@ -1104,6 +1109,42 @@
             preventUnconfirmedUTXO = getBoolean
             getRef('allow_utxo_switch').checked = getBoolean
         }
+
+        const selectedColors = [
+            '--dark-red',
+            '--red',
+            '--kinda-pink',
+            '--purple',
+            '--shady-blue',
+            '--nice-blue',
+            '--maybe-cyan',
+            '--teal',
+            '--mint-green',
+            '--yellowish-green',
+            '--greenish-yellow',
+            '--dark-teal',
+            '--tangerine',
+            '--orange',
+            '--redish-orange',
+        ]
+        function randomColor() {
+            return selectedColors[Math.floor(Math.random() * selectedColors.length)]
+        }
+        getRef('accent_color_selector').colors = selectedColors
+
+        if (localStorage.getItem(`accent-color`)) {
+            const color = localStorage.getItem(`accent-color`)
+            getRef('accent_color_selector').selectedColor = color
+            document.body.style.setProperty('--accent-color', `var(${color})`);
+        }
+        else {
+            getRef('accent_color_selector').selectedColor = '#3D5AFE'
+        }
+        document.addEventListener('colorselected', e => {
+            const color = e.detail.value
+            localStorage.setItem(`accent-color`, color);
+            document.body.style.setProperty('--accent-color', `var(${color})`);
+        })
     </script>
 
     <script id="init_lib" version="1.0.1">
