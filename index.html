@@ -123,23 +123,30 @@
                 </section>
             </div>
             <div id="transactions" class="hide page">
-                <header class="flex align-center w-100">
-                    <a href="#/home" class="flex interact icon-only">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                            width="24px" fill="#000000">
-                            <path d="M0 0h24v24H0z" fill="none" />
-                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-                        </svg>
-                    </a>
-                    <h4 id="flo_id_name"></h4>
-                    <button class="icon-only" style="margin-left:auto" onclick="refreshData()">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                            width="24px" fill="#000000">
-                            <path d="M0 0h24v24H0z" fill="none" />
-                            <path
-                                d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
-                        </svg>
-                    </button>
+                <header class="grid" style="padding: 1rem 0;">
+                    <div class="flex align-center w-100">
+                        <a href="#/home" class="flex interact icon-only">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                            </svg>
+                        </a>
+                        <h4 id="flo_id_name"></h4>
+                        <button class="icon-only" style="margin-left:auto" onclick="refreshData()">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <strip-select id="filter_selector" class="justify-self-center">
+                        <strip-option value="sent" selected>Sent</strip-option>
+                        <strip-option value="received">Received</strip-option>
+                        <strip-option value="all">All</strip-option>
+                    </strip-select>
                 </header>
                 <ul id="transactions_list" class="flex observe-empty-state"></ul>
                 <div class="empty-state flex justify-center align-center h-100">
@@ -656,7 +663,6 @@
         }
 
         const pagesData = {
-            openedPages: [],
             params: {}
         }
 
@@ -689,10 +695,15 @@
                 const urlSearchParams = new URLSearchParams('?' + searchParams);
                 params = Object.fromEntries(urlSearchParams.entries());
             }
+            if (pagesData.lastPage !== pageId) {
+                pagesData.lastPage = pageId
+            }
+            if (params)
+                pagesData.params = params
             switch (pageId) {
                 case 'transactions':
                     floWebWallet.getLabels().then(allLabels => {
-                        getRef('flo_id_name').textContent = allLabels.hasOwnProperty(params.id) ? allLabels[params.id] === 'Unknown' ? params.id : allLabels[params.id] : allLabels[params.id]
+                        getRef('flo_id_name').textContent = allLabels.hasOwnProperty(params.id) ? allLabels[params.id] === 'Unknown' ? params.id : allLabels[params.id] : params.id
                     })
                     render.transactions(params.id)
                     break;
@@ -706,7 +717,7 @@
             const currentActiveElement = document.querySelector(`.nav-item[href="#/${pageId}"]`)
             if (currentActiveElement) {
                 getRef('main_navbar').classList.remove('hide')
-                getRef('main_card').classList.remove('full-page')
+                getRef('main_header').classList.remove('hide')
                 const previousActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(previousActiveElement)
                 const currentActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(currentActiveElement)
                 const isOnTop = previousActiveElementIndex < currentActiveElementIndex
@@ -750,19 +761,11 @@
                 currentActiveElement.classList.add('nav-item--active')
             } else {
                 getRef('main_navbar').classList.add('hide')
-                getRef('main_card').classList.add('full-page')
+                getRef('main_header').classList.add('hide')
             }
             document.querySelectorAll('.page').forEach(page => page.classList.add('hide'))
             getRef(pageId).classList.remove('hide')
             animateTo(getRef(pageId), [{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards', easing: 'ease' })
-            if (pagesData.lastPage !== pageId) {
-                pagesData.lastPage = pageId
-                if (!pagesData.openedPages.includes(pageId)) {
-                    pagesData.openedPages.push(pageId)
-                }
-            }
-            if (params)
-                pagesData.params = params
         }
 
         const indicatorObserver = new IntersectionObserver(entries => {
@@ -903,14 +906,14 @@
                 }
             },
             transactionCard(details) {
-                const { floID, sender, receiver, floData, time } = details
+                const { sender, receiver, floData, time } = details
                 const clone = getRef('transaction_template').content.cloneNode(true).firstElementChild;
-                if (floID === sender) {
+                if (pagesData.params.id === sender) {
                     clone.querySelector('.transaction__icon').innerHTML = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 5v2h6.59L4 18.59 5.41 20 17 8.41V15h2V5z"/></svg>`;
                 } else {
                     clone.querySelector('.transaction__icon').innerHTML = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 5.41L18.59 4 7 15.59V9H5v10h10v-2H8.41z"/></svg>`;
                 }
-                clone.querySelector('.transaction__receiver').textContent = floID === sender ? receiver : sender
+                clone.querySelector('.transaction__receiver').textContent = pagesData.params.id === sender ? receiver : sender
                 clone.querySelector('.transaction__flo-data').textContent = floData
                 clone.querySelector('.transaction__time').textContent = getFormattedTime(time * 1000)
                 return clone
@@ -919,11 +922,15 @@
                 try {
                     getRef('transactions_list').innerHTML = '';
                     await floWebWallet.syncTransactions(floID);
-                    const allTransactions = await floWebWallet.readTransactions(floID);
+                    let allTransactions = (await floWebWallet.readTransactions(floID)).reverse();
+                    const filter = getRef('filter_selector').value;
+                    if (filter !== 'all') {
+                        allTransactions = allTransactions.filter(t => filter === 'sent' ? t.sender === floID : t.receiver === floID)
+                    }
                     if (transactionsLazyLoader) {
                         transactionsLazyLoader.update(allTransactions)
                     } else {
-                        transactionsLazyLoader = new LazyLoader('#transactions_list', allTransactions.reverse(), render.transactionCard)
+                        transactionsLazyLoader = new LazyLoader('#transactions_list', allTransactions, render.transactionCard)
                         transactionsLazyLoader.init()
                     }
                     getRef('transactions_list').scroll({
@@ -953,7 +960,6 @@
                 navigator.clipboard.writeText(target.dataset.floId)
                 target.dispatchEvent(
                     new CustomEvent('copy', {
-                        composed: true,
                         bubbles: true,
                         cancelable: true,
                     })
@@ -962,6 +968,15 @@
                 const target = e.target.closest('.saved-id');
                 window.location.hash = `#/transactions?id=${target.dataset.floId}`
             }
+        })
+
+        getRef('filter_selector').addEventListener('change', async e => {
+            const filter = e.target.value
+            let allTransactions = (await floWebWallet.readTransactions(pagesData.params.id)).reverse()
+            if (filter !== 'all') {
+                allTransactions = allTransactions.filter(t => filter === 'sent' ? t.sender === pagesData.params.id : t.receiver === pagesData.params.id)
+            }
+            transactionsLazyLoader.update(allTransactions)
         })
 
         function saveFloId() {

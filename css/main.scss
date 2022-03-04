@@ -198,6 +198,16 @@ sm-spinner {
 sm-form {
   --gap: 1rem;
 }
+strip-select {
+  --gap: 0;
+  background-color: rgba(var(--text-color), 0.06);
+  border-radius: 0.3rem;
+  padding: 0.3rem;
+}
+strip-option {
+  font-size: 0.8rem;
+  --border-radius: 0.2rem;
+}
 ul {
   list-style: none;
 }
@@ -483,9 +493,7 @@ textarea {
   font-family: inherit;
   transition: box-shadow 0.2s ease;
   outline: none;
-}
-
-textarea {
+  caret-color: var(--accent-color, teal);
   resize: none;
   line-height: 1.6;
 }
@@ -642,7 +650,6 @@ textarea {
   flex-direction: column;
   overflow-y: auto;
   height: 100%;
-  margin-top: 1rem;
   padding-bottom: 4rem;
 }
 .transaction {
@@ -659,6 +666,7 @@ textarea {
   &__receiver {
     font-size: 0.8rem;
     margin-left: 0.5rem;
+    color: rgba(var(--text-color), 0.8);
   }
   p {
     font-size: 0.9rem;
@@ -667,6 +675,7 @@ textarea {
   &__time {
     font-size: 0.8rem;
     justify-self: flex-end;
+    color: rgba(var(--text-color), 0.8);
   }
 }
 #scrollToTop {
