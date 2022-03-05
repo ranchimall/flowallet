@@ -163,15 +163,15 @@
                     </div>
                     <div class="grid gap-0-5">
                         <h5>Transactions</h5>
-                        <ul id="transactions_list" class="flex observe-empty-state"></ul>
-                        <div class="empty-state flex justify-center align-center h-100">
-                            <div class="grid justify-center text-center gap-1">
-                                <sm-spinner></sm-spinner>
-                                <span>Loading transactions</span>
-                            </div>
-                        </div>
+                        <ul id="transactions_list" class="flex"></ul>
                     </div>
                 </section>
+                <div class="empty-state flex justify-center align-center h-100">
+                    <div class="grid justify-center text-center gap-1">
+                        <sm-spinner></sm-spinner>
+                        <span>Loading transactions</span>
+                    </div>
+                </div>
                 <button id="scrollToTop" onclick="backToTop()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
@@ -383,17 +383,19 @@
                 <h5>FLO ID</h5>
                 <sm-copy id="edit_saved_id"></sm-copy>
             </div>
-            <sm-input id="newAddrLabel" placeholder="Name" autofocus animate></sm-input>
-            <div class="flex align-center space-between">
-                <button class="button icon-only" title="Delete this FLO ID?" onclick="deleteSaved()">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
-                        fill="#000000">
-                        <path d="M0 0h24v24H0z" fill="none" />
-                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                    </svg>
-                </button>
-                <button class="button button--primary cta" onclick="saveChanges()">Save</button>
-            </div>
+            <sm-form>
+                <sm-input id="newAddrLabel" placeholder="Name" autofocus animate></sm-input>
+                <div class="flex align-center space-between">
+                    <button class="button icon-only" title="Delete this FLO ID?" onclick="deleteSaved()">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#000000">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                        </svg>
+                    </button>
+                    <button class="button button--primary cta" type="submit" onclick="saveChanges()">Save</button>
+                </div>
+            </sm-form>
         </section>
     </sm-popup>
     <sm-popup id="create_flo_id_popup">
@@ -1019,6 +1021,8 @@
             },
             async transactions(floID) {
                 try {
+                    getRef('transactions_scroller').nextElementSibling.classList.remove('hide')
+                    getRef('transactions_scroller').classList.add('hide')
                     getRef('transactions_list').innerHTML = '';
                     await floWebWallet.syncTransactions(floID);
                     let allTransactions = (await floWebWallet.readTransactions(floID)).reverse();
@@ -1032,6 +1036,8 @@
                         transactionsLazyLoader = new LazyLoader('#transactions_list', allTransactions, render.transactionCard)
                         transactionsLazyLoader.init()
                     }
+                    getRef('transactions_scroller').classList.remove('hide')
+                    getRef('transactions_scroller').nextElementSibling.classList.add('hide')
                     getRef('transactions_scroller').scroll({
                         top: 0
                     })
@@ -1114,7 +1120,7 @@
             if (label == '')
                 label = 'Unknown'
             compactIDB.addData('labels', label, floID).then((resolve) => {
-                getRef('saved_ids_list').append(render.savedIdCard(floID, label))
+                getRef('saved_ids_list').prepend(render.savedIdCard(floID, label))
                 hidePopup()
             }).catch((error) => {
                 notify('FLO ID already saved', 'error');
