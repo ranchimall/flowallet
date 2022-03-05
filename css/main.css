@@ -236,13 +236,6 @@ ul {
   list-style: none;
 }
 
-img {
-  border-radius: 0.5rem;
-  -o-object-fit: cover;
-     object-fit: cover;
-  width: 100%;
-}
-
 .overflow-ellipsis {
   width: 100%;
   overflow: hidden;
@@ -290,6 +283,15 @@ h3 {
 
 .capitalize {
   text-transform: capitalize;
+}
+
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}
+
+.top-0 {
+  top: 0;
 }
 
 .flex {
@@ -449,14 +451,11 @@ h3 {
   flex-shrink: 0;
 }
 
-.button__icon {
-  height: 1.2rem;
-  width: 1.2rem;
-}
-.button__icon--left {
+.margin-right-0-5 {
   margin-right: 0.5rem;
 }
-.button__icon--right {
+
+.margin-left-0-5 {
   margin-left: 0.5rem;
 }
 
@@ -807,8 +806,10 @@ textarea {
 .transaction .icon {
   fill: var(--accent-color);
 }
-.transaction__receiver {
+.transaction__time, .transaction__link, .transaction__receiver {
   font-size: 0.8rem;
+}
+.transaction__receiver {
   margin-left: 0.5rem;
   color: rgba(var(--text-color), 0.8);
 }
@@ -817,7 +818,6 @@ textarea {
   max-width: unset;
 }
 .transaction__time {
-  font-size: 0.8rem;
   justify-self: flex-end;
   color: rgba(var(--text-color), 0.8);
 }

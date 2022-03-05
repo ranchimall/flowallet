@@ -95,7 +95,7 @@
                     <div class="grid align-center gap-0-5">
                         <div class="flex align-center space-between">
                             <div class="flex align-center">
-                                <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
                                     viewBox="0 0 24 24" width="24px" fill="#000000">
                                     <path d="M0 0h24v24H0z" fill="none" />
                                     <path
@@ -105,7 +105,7 @@
                             </div>
                             <button class="button interact" onclick="showPopup('add_address_popup')"
                                 style="padding: 0.4rem 0.6rem;">
-                                <svg class="icon button__icon--left" style="fill: var(--accent-color);"
+                                <svg class="icon margin-right-0-5" style="fill: var(--accent-color);"
                                     xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                                     fill="#000000">
                                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -150,19 +150,39 @@
                             </svg>
                         </button>
                     </div>
-                    <strip-select id="filter_selector" class="justify-self-center">
-                        <strip-option value="sent" selected>Sent</strip-option>
-                        <strip-option value="received">Received</strip-option>
-                        <strip-option value="all">All</strip-option>
-                    </strip-select>
                 </header>
                 <section id="transactions_scroller" class="grid gap-1-5" style="overflow-y: auto;padding: 0 1.5rem;">
-                    <div id="tokens" class="grid gap-0-5 hide">
-                        <h5>Tokens owned</h5>
+                    <div id="tokens" class="grid gap-1 hide">
+                        <div class="flex align-center">
+                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                viewBox="0 0 24 24" width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                <path
+                                    d="M15 4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" />
+                                <path
+                                    d="M3 12c0-2.61 1.67-4.83 4-5.65V4.26C3.55 5.15 1 8.27 1 12s2.55 6.85 6 7.74v-2.09c-2.33-.82-4-3.04-4-5.65z" />
+                            </svg>
+                            <h5>Tokens owned</h5>
+                        </div>
                         <ul id="token_list"></ul>
                     </div>
                     <div class="grid gap-0-5">
-                        <h5>Transactions</h5>
+                        <div class="flex align-center space-between sticky top-0"
+                            style="background-color: rgba(var(--foreground-color),1); padding: 0.5rem 0;">
+                            <div class="flex">
+                                <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                    viewBox="0 0 24 24" width="24px" fill="#000000">
+                                    <path d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z" />
+                                </svg>
+                                <h5>Transactions</h5>
+                            </div>
+                            <strip-select id="filter_selector">
+                                <strip-option value="sent" selected>Sent</strip-option>
+                                <strip-option value="received">Received</strip-option>
+                                <strip-option value="all">All</strip-option>
+                            </strip-select>
+                        </div>
                         <ul id="transactions_list" class="flex"></ul>
                     </div>
                 </section>
@@ -222,7 +242,7 @@
                     </sm-input>
                     <label class="textarea">
                         <textarea maxlength="1040" aria-label="FLO data" data-gramm_editor="false" rows="6"
-                            id="flotextdata"></textarea>
+                            id="flo_data_textarea"></textarea>
                         <div class="label">FLO data</div>
                     </label>
                     <div id="show_character_count">1040/1040</div>
@@ -284,7 +304,7 @@
                         </svg>
                     </summary>
                     <sm-switch id="allow_utxo_switch" class="w-100" aria-label="Allow unconfirmed UTXOs">
-                        <div slot="left" class="grid gap-0-5 button__icon--left">
+                        <div slot="left" class="grid gap-0-5 margin-right-0-5">
                             <h4>Allow unconfirmed UTXOs</h4>
                             <strong id="unconfirmed_UTXO_warning"
                                 style="background-color: khaki; padding: 0.5rem; border-radius: 0.3rem; color: #000000a8; justify-self: flex-start;">
@@ -384,7 +404,7 @@
                 <sm-copy id="edit_saved_id"></sm-copy>
             </div>
             <sm-form>
-                <sm-input id="newAddrLabel" placeholder="Name" autofocus animate></sm-input>
+                <sm-input id="newAddrLabel" placeholder="Name" autofocus animate required></sm-input>
                 <div class="flex align-center space-between">
                     <button class="button icon-only" title="Delete this FLO ID?" onclick="deleteSaved()">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
@@ -460,7 +480,7 @@
             <h4 class="saved-id__label"></h4>
             <div class="grid align-center" style="grid-template-columns: 1fr auto;">
                 <div class="saved-id__flo-id overflow-ellipsis"></div>
-                <button class="copy-saved-id icon-only button__icon--right" title="Copy FLO ID">
+                <button class="copy-saved-id icon-only margin-left-0-5" title="Copy FLO ID">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
                         <path d="M0 0h24v24H0z" fill="none" />
@@ -478,7 +498,18 @@
                 <div class="transaction__receiver"></div>
             </div>
             <p class="transaction__flo-data breakable"></p>
-            <time class="transaction__time"></time>
+            <div class="flex align-center space-between">
+                <a href="" class="transaction__link flex align-center" target="_blank" rel="noopener noreferrer">
+                    <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
+                        viewBox="0 0 24 24" width="24px" fill="#000000">
+                        <path d="M0 0h24v24H0z" fill="none" />
+                        <path
+                            d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+                    </svg>
+                    See transaction
+                </a>
+                <time class="transaction__time"></time>
+            </div>
         </li>
     </template>
     <script>
@@ -792,14 +823,18 @@
                     fetch(`https://ranchimallflo.duckdns.org/api/v1.0/getFloAddressBalance?floAddress=${params.id}`).then(res => res.json()).then(({ floAddressBalances }) => {
                         const frag = document.createDocumentFragment()
                         getRef('token_list').innerHTML = ''
+                        let hasTokens = false
                         for (const token in floAddressBalances) {
+                            hasTokens = true
                             frag.append(createElement('li', {
                                 className: 'token-item',
                                 innerHTML: `<span>${token}: </span><span>${floAddressBalances[token].balance}</span>`
                             }))
                         }
-                        getRef('token_list').append(frag)
-                        getRef('tokens').classList.remove('hide')
+                        if (hasTokens) {
+                            getRef('token_list').append(frag)
+                            getRef('tokens').classList.remove('hide')
+                        }
 
                     }).catch(e => {
                         console.error(e)
@@ -811,7 +846,7 @@
                     break;
             }
             const animOptions = {
-                duration: 150,
+                duration: 100,
                 fill: 'forwards',
             }
             let previousActiveElement = getRef('main_navbar').querySelector('.nav-item--active')
@@ -1007,7 +1042,7 @@
                 }
             },
             transactionCard(details) {
-                const { sender, receiver, floData, time } = details
+                const { sender, receiver, floData, time, txid } = details
                 const clone = getRef('transaction_template').content.cloneNode(true).firstElementChild;
                 if (pagesData.params.id === sender) {
                     clone.querySelector('.transaction__icon').innerHTML = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 5v2h6.59L4 18.59 5.41 20 17 8.41V15h2V5z"/></svg>`;
@@ -1016,6 +1051,7 @@
                 }
                 clone.querySelector('.transaction__receiver').textContent = pagesData.params.id === sender ? receiver : sender
                 clone.querySelector('.transaction__flo-data').textContent = floData
+                clone.querySelector('.transaction__link').href = `https://flosight.duckdns.org/tx/${txid}`
                 clone.querySelector('.transaction__time').textContent = getFormattedTime(time * 1000)
                 return clone
             },
@@ -1177,7 +1213,7 @@
             let sender = getRef('getBal_addr').value,
                 amount = parseFloat(getRef('amount').value),
                 receiver = getRef('receiver').value,
-                floData = getRef('flotextdata').value,
+                floData = getRef('flo_data_textarea').value,
                 privKey = getRef('privKey').value;
             floWebWallet.sendTransaction(sender, receiver, amount, floData, privKey).then((transactionid) => {
                 getRef('transactionId').textContent = `transaction ID : ${transactionid}`;
@@ -1207,12 +1243,12 @@
             });
         }
 
-        getRef('flotextdata').addEventListener('keydown', e => {
+        getRef('flo_data_textarea').addEventListener('keydown', e => {
             if (e.target.value.length > 1040)
                 e.preventDefault()
         })
 
-        getRef('flotextdata').addEventListener('input', function (e) {
+        getRef('flo_data_textarea').addEventListener('input', function (e) {
             if (this.value.trim() !== '') {
                 getRef('sendBtn').classList.add('hide')
                 getRef('fix_invalid_button').classList.remove('hide')
@@ -1229,7 +1265,7 @@
             checkFloData()
         })
         function checkFloData() {
-            const floDataText = getRef('flotextdata').value;
+            const floDataText = getRef('flo_data_textarea').value;
             if (/^[\x20-\x7E]*$/.test(floDataText)) {
                 getRef('sendBtn').classList.remove('hide')
                 getRef('fix_invalid_button').classList.add('hide')
@@ -1240,8 +1276,8 @@
             }
         }
         function removeInvalid() {
-            const floDataText = getRef('flotextdata').value;
-            getRef('flotextdata').value = floDataText.replace(/\s/g, " ").replace(/[^\x20-\x7E]/g, '');
+            const floDataText = getRef('flo_data_textarea').value;
+            getRef('flo_data_textarea').value = floDataText.replace(/\s/g, " ").replace(/[^\x20-\x7E]/g, '');
             checkFloData()
         }
 
@@ -1266,16 +1302,13 @@
             '--maybe-cyan',
             '--teal',
             '--mint-green',
-            '--yellowish-green',
             '--greenish-yellow',
+            '--yellowish-green',
             '--dark-teal',
-            '--tangerine',
             '--orange',
+            '--tangerine',
             '--redish-orange',
         ]
-        function randomColor() {
-            return selectedColors[Math.floor(Math.random() * selectedColors.length)]
-        }
     </script>
 
     <script id="init_lib" version="1.0.1">

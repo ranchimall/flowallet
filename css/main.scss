@@ -216,11 +216,6 @@ strip-option {
 ul {
   list-style: none;
 }
-img {
-  border-radius: 0.5rem;
-  object-fit: cover;
-  width: 100%;
-}
 
 .overflow-ellipsis {
   width: 100%;
@@ -266,6 +261,13 @@ h3 {
 
 .capitalize {
   text-transform: capitalize;
+}
+
+.sticky {
+  position: sticky;
+}
+.top-0 {
+  top: 0;
 }
 
 .flex {
@@ -426,18 +428,12 @@ h3 {
   fill: rgba(var(--text-color), 0.8);
   flex-shrink: 0;
 }
+.margin-right-0-5 {
+  margin-right: 0.5rem;
+}
 
-.button__icon {
-  height: 1.2rem;
-  width: 1.2rem;
-
-  &--left {
-    margin-right: 0.5rem;
-  }
-
-  &--right {
-    margin-left: 0.5rem;
-  }
+.margin-left-0-5 {
+  margin-left: 0.5rem;
 }
 
 .icon-button {
@@ -762,8 +758,12 @@ textarea {
   .icon {
     fill: var(--accent-color);
   }
+  &__time,
+  &__link,
   &__receiver {
     font-size: 0.8rem;
+  }
+  &__receiver {
     margin-left: 0.5rem;
     color: rgba(var(--text-color), 0.8);
   }
@@ -772,7 +772,6 @@ textarea {
     max-width: unset;
   }
   &__time {
-    font-size: 0.8rem;
     justify-self: flex-end;
     color: rgba(var(--text-color), 0.8);
   }
@@ -813,6 +812,9 @@ textarea {
 #transaction-complete button {
   position: absolute;
   bottom: 0;
+}
+
+#settings {
 }
 
 @media screen and (min-width: 40rem) {
