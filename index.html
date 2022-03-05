@@ -94,10 +94,18 @@
                 <section class="grid gap-1-5">
                     <div class="grid align-center gap-0-5">
                         <div class="flex align-center space-between">
-                            <h4>Saved FLO IDs</h4>
+                            <div class="flex align-center">
+                                <svg class="icon button__icon--left" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                    viewBox="0 0 24 24" width="24px" fill="#000000">
+                                    <path d="M0 0h24v24H0z" fill="none" />
+                                    <path
+                                        d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" />
+                                </svg>
+                                <h4>Saved FLO IDs</h4>
+                            </div>
                             <button class="button interact" onclick="showPopup('add_address_popup')"
                                 style="padding: 0.4rem 0.6rem;">
-                                <svg class="icon" style="fill: var(--accent-color); margin-right: 0.3rem;"
+                                <svg class="icon button__icon--left" style="fill: var(--accent-color);"
                                     xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                                     fill="#000000">
                                     <path d="M0 0h24v24H0V0z" fill="none" />
@@ -123,8 +131,8 @@
                 </section>
             </div>
             <div id="transactions" class="hide page">
-                <header class="grid" style="padding: 1rem 0;">
-                    <div class="flex align-center w-100">
+                <header class="grid">
+                    <div class="grid gap-0-5 align-center w-100">
                         <a href="#/home" class="flex interact icon-only">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                                 width="24px" fill="#000000">
@@ -148,13 +156,22 @@
                         <strip-option value="all">All</strip-option>
                     </strip-select>
                 </header>
-                <ul id="transactions_list" class="flex observe-empty-state"></ul>
-                <div class="empty-state flex justify-center align-center h-100">
-                    <div class="grid justify-center text-center gap-1">
-                        <sm-spinner></sm-spinner>
-                        <span>Loading transactions</span>
+                <section id="transactions_scroller" class="grid gap-1-5" style="overflow-y: auto;padding: 0 1.5rem;">
+                    <div id="tokens" class="grid gap-0-5 hide">
+                        <h5>Tokens owned</h5>
+                        <ul id="token_list"></ul>
                     </div>
-                </div>
+                    <div class="grid gap-0-5">
+                        <h5>Transactions</h5>
+                        <ul id="transactions_list" class="flex observe-empty-state"></ul>
+                        <div class="empty-state flex justify-center align-center h-100">
+                            <div class="grid justify-center text-center gap-1">
+                                <sm-spinner></sm-spinner>
+                                <span>Loading transactions</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
                 <button id="scrollToTop" onclick="backToTop()">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                         fill="#000000">
@@ -169,8 +186,18 @@
                     <p>Perform FLO blockchain transactions</p>
                 </div>
                 <sm-form>
-                    <sm-input id="getBal_addr" placeholder="Sender FLO ID" error-text="Invalid FLO ID" data-flo-id=""
-                        animate required></sm-input>
+                    <sm-input id="getBal_addr" class="w-100" placeholder="Sender FLO ID" error-text="Invalid FLO ID"
+                        data-flo-id="" animate required>
+                        <button slot="right" class="icon-only" onclick="showFloIdPicker('sender')"
+                            title="Select from saved IDs">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" />
+                            </svg>
+                        </button>
+                    </sm-input>
                     <div class="flex align-center space-between">
                         <span id="sender_balance" style="font-size: 0.9rem;"></span>
                         <button id="getBal_btn" class="button" style="padding: 0.4rem 0.6rem;"
@@ -179,8 +206,18 @@
                     </div>
                 </sm-form>
                 <sm-form>
-                    <sm-input id="receiver" placeholder="Receiver's FLO ID" error-text="Invalid FLO ID" data-flo-id=""
-                        animate required></sm-input>
+                    <sm-input id="receiver" class="w-100" placeholder="Receiver's FLO ID" error-text="Invalid FLO ID"
+                        data-flo-id="" animate required>
+                        <button slot="right" class="icon-only" onclick="showFloIdPicker('receiver')"
+                            title="Select from saved IDs">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                width="24px" fill="#000000">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" />
+                            </svg>
+                        </button>
+                    </sm-input>
                     <sm-input id="amount" type="number" placeholder="Amount" error-text="Invalid amount" animate>
                     </sm-input>
                     <label class="textarea">
@@ -223,7 +260,7 @@
                 <h4 id="transactionId"></h4>
                 <button class="button button--primary" onclick="showPage('sendDataBtn', 'send')">Done</button>
             </div>
-            <div id="settings" class="page hide">
+            <div id="settings" class="page hide gap-2">
                 <h3>Settings</h3>
                 <section class="grid gap-1">
                     <h4>Accent color</h4>
@@ -386,6 +423,27 @@
             <div id="created_flo_id"></div>
         </div>
     </sm-popup>
+    <sm-popup id="saved_ids_popup">
+        <header slot="header" class="popup__header">
+            <div class="flex align-center">
+                <button class="popup__header__close" onclick="hidePopup()">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
+                        fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+        <section class="grid gap-1">
+            <sm-input id="search_saved_ids" placeholder="Search"></sm-input>
+            <ul id="saved_ids_picker_list" class="observe-empty-state grid gap-0-5"></ul>
+            <div class="empty-state">
+                <h3>No saved FLO IDs</h3>
+            </div>
+        </section>
+    </sm-popup>
     <template id="saved_id_template">
         <li class="saved-id grid interact">
             <button class="interact edit-saved icon-only" title="Edit name">
@@ -507,11 +565,37 @@
             popupStack.peek().popup.hide()
         }
 
-        document.addEventListener('popupopened', e => {
+        document.addEventListener('popupopened', async e => {
+            switch (e.target.id) {
+                case 'saved_ids_popup':
+                    const frag = document.createDocumentFragment()
+                    getRef('saved_ids_picker_list').innerHTML = ''
+                    const allSavedIds = await floWebWallet.getLabels();
+                    for (const id in allSavedIds) {
+                        frag.append(
+                            createElement('li', {
+                                className: 'saved-id grid interact',
+                                attributes: { 'tabindex': '0', 'data-flo-id': id },
+                                innerHTML: `
+                                    <div class="saved-id__initial">${allSavedIds[id][0]}</div>
+                                    <div class="grid gap-0-5">
+                                        <h4 class="saved-id__label">${allSavedIds[id]}</h4>
+                                        <div class="saved-id__flo-id overflow-ellipsis">${id}</div>
+                                    </div>
+                                    `
+                            })
+                        )
+                    }
+                    getRef('saved_ids_picker_list').append(frag)
+                    break;
+            }
         })
         document.addEventListener('popupclosed', e => {
             zIndex--
             switch (e.target.id) {
+                case 'saved_ids_popup':
+                    getRef('saved_ids_picker_list').innerHTML = ''
+                    break;
             }
         })
 
@@ -702,6 +786,22 @@
                 pagesData.params = params
             switch (pageId) {
                 case 'transactions':
+                    getRef('tokens').classList.add('hide')
+                    fetch(`https://ranchimallflo.duckdns.org/api/v1.0/getFloAddressBalance?floAddress=${params.id}`).then(res => res.json()).then(({ floAddressBalances }) => {
+                        const frag = document.createDocumentFragment()
+                        getRef('token_list').innerHTML = ''
+                        for (const token in floAddressBalances) {
+                            frag.append(createElement('li', {
+                                className: 'token-item',
+                                innerHTML: `<span>${token}: </span><span>${floAddressBalances[token].balance}</span>`
+                            }))
+                        }
+                        getRef('token_list').append(frag)
+                        getRef('tokens').classList.remove('hide')
+
+                    }).catch(e => {
+                        console.error(e)
+                    })
                     floWebWallet.getLabels().then(allLabels => {
                         getRef('flo_id_name').textContent = allLabels.hasOwnProperty(params.id) ? allLabels[params.id] === 'Unknown' ? params.id : allLabels[params.id] : params.id
                     })
@@ -710,7 +810,6 @@
             }
             const animOptions = {
                 duration: 150,
-                easing: 'ease',
                 fill: 'forwards',
             }
             let previousActiveElement = getRef('main_navbar').querySelector('.nav-item--active')
@@ -746,7 +845,7 @@
                             transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `${moveBy}px` : `-${moveBy}px`})`,
                             opacity: 0,
                         },
-                    ], animOptions).onfinish = () => {
+                    ], { ...animOptions, easing: 'ease-in' }).onfinish = () => {
                         previousIndicator.remove()
                     }
                     tempData = {
@@ -782,7 +881,7 @@
                             transform: 'none',
                             opacity: 1
                         },
-                    ], animOptions)
+                    ], { ...animOptions, easing: 'ease-out' })
                 }
             })
         }, {
@@ -933,7 +1032,7 @@
                         transactionsLazyLoader = new LazyLoader('#transactions_list', allTransactions, render.transactionCard)
                         transactionsLazyLoader.init()
                     }
-                    getRef('transactions_list').scroll({
+                    getRef('transactions_scroller').scroll({
                         top: 0
                     })
                 } catch (err) {
@@ -969,6 +1068,11 @@
                 window.location.hash = `#/transactions?id=${target.dataset.floId}`
             }
         })
+        delegate(getRef('saved_ids_picker_list'), 'click', '.saved-id', e => {
+            const target = e.target.closest('.saved-id');
+            getRef(`${openSavedIdPopupFor === 'sender' ? 'getBal_addr' : 'receiver'}`).value = target.dataset.floId
+            hidePopup()
+        })
 
         getRef('filter_selector').addEventListener('change', async e => {
             const filter = e.target.value
@@ -978,6 +1082,31 @@
             }
             transactionsLazyLoader.update(allTransactions)
         })
+        getRef('GenNewAddrBtn').addEventListener('click', () => {
+            const { floID, privKey } = floCrypto.generateNewID(),
+                card = createElement('div', {
+                    className: 'generated-id-card',
+                    innerHTML: `
+                <div>
+                    <h5>FLO Address</h5>
+                    <sm-copy value="${floID}"></sm-copy>
+                </div>
+                <div>
+                    <h5>Private Key</h5>
+                    <sm-copy value="${privKey}"></sm-copy>
+                </div>
+                `
+                });
+            getRef('created_flo_id').innerHTML = '';
+            getRef('created_flo_id').append(card);
+            showPopup('create_flo_id_popup');
+        });
+
+        let openSavedIdPopupFor = null;
+        function showFloIdPicker(type) {
+            openSavedIdPopupFor = type;
+            showPopup('saved_ids_popup');
+        }
 
         function saveFloId() {
             const floID = getRef('floAddr').value.trim()
@@ -1003,25 +1132,6 @@
             })
         }
 
-        getRef('GenNewAddrBtn').addEventListener('click', () => {
-            const { floID, privKey } = floCrypto.generateNewID(),
-                card = createElement('div', {
-                    className: 'generated-id-card',
-                    innerHTML: `
-                <div>
-                    <h5>FLO Address</h5>
-                    <sm-copy value="${floID}"></sm-copy>
-                </div>
-                <div>
-                    <h5>Private Key</h5>
-                    <sm-copy value="${privKey}"></sm-copy>
-                </div>
-                `
-                });
-            getRef('created_flo_id').innerHTML = '';
-            getRef('created_flo_id').append(card);
-            showPopup('create_flo_id_popup');
-        });
 
 
         function saveChanges() {
@@ -1085,7 +1195,7 @@
         }
 
         function backToTop() {
-            getRef('transactions_list').scroll({
+            getRef('transactions_scroller').scroll({
                 top: 0,
                 behavior: 'smooth'
             });

@@ -24,8 +24,6 @@ body {
   scrollbar-width: thin;
   scrollbar-gutter: stable;
   color: rgba(var(--text-color), 1);
-  background: url("back.png") no-repeat;
-  background-size: cover;
   background-color: rgba(var(--background-color), 1);
   // Accent colors
   --dark-red: #d40b34;
@@ -109,6 +107,9 @@ button {
   padding: 0.8rem;
   border-radius: 0.3rem;
   justify-content: center;
+  &:focus-visible {
+    outline: var(--accent-color) solid medium;
+  }
 }
 .button {
   background-color: rgba(var(--text-color), 0.06);
@@ -170,8 +171,12 @@ sm-input,
 sm-textarea {
   font-size: 0.9rem;
   --border-radius: 0.3rem;
-  --padding: 1rem 0.8rem;
   --background-color: rgba(var(--foreground-color), 1);
+  button {
+    .icon {
+      fill: var(--accent-color);
+    }
+  }
 }
 sm-button {
   --padding: 0.6rem 0.8rem;
@@ -491,7 +496,7 @@ textarea {
   border-radius: 0.3rem;
   border: none;
   font-family: inherit;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s;
   outline: none;
   caret-color: var(--accent-color, teal);
   resize: none;
@@ -505,8 +510,7 @@ textarea {
   border-radius: 0.3rem;
   padding: 1rem 0.8rem;
   background-color: rgba(var(--text-color), 0.06);
-  // box-shadow: 0 0 0 1px rgba(var(--text-color), 0.3) inset;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s;
   & > * {
     padding: 0;
     grid-area: 1/1/2/2;
@@ -515,7 +519,7 @@ textarea {
     align-self: flex-start;
     pointer-events: none;
     opacity: 0.6;
-    transition: transform 0.2s ease, color 0.2s ease;
+    transition: transform 0.2s, color 0.2s;
     user-select: none;
     transform-origin: left;
     will-change: transform;
@@ -555,8 +559,7 @@ textarea {
   flex-direction: column;
   height: 100%;
   width: 100%;
-  backdrop-filter: blur(2rem);
-  background-color: rgba(var(--foreground-color), 0.9);
+  background-color: rgba(var(--foreground-color), 1);
 }
 #pages_container {
   flex: 1;
@@ -640,55 +643,6 @@ textarea {
     margin-bottom: 0.3rem;
   }
 }
-
-#transactions {
-  position: relative;
-  height: 100%;
-  padding-bottom: 1.5rem;
-}
-#transactions_list {
-  flex-direction: column;
-  overflow-y: auto;
-  height: 100%;
-  padding-bottom: 4rem;
-}
-.transaction {
-  gap: 1rem;
-  padding: 1rem;
-  background-color: rgba(var(--text-color), 0.03);
-  border-radius: 0.3rem;
-  &:not(:last-of-type) {
-    margin-bottom: 1rem;
-  }
-  .icon {
-    fill: var(--accent-color);
-  }
-  &__receiver {
-    font-size: 0.8rem;
-    margin-left: 0.5rem;
-    color: rgba(var(--text-color), 0.8);
-  }
-  p {
-    font-size: 0.9rem;
-    max-width: unset;
-  }
-  &__time {
-    font-size: 0.8rem;
-    justify-self: flex-end;
-    color: rgba(var(--text-color), 0.8);
-  }
-}
-#scrollToTop {
-  background-color: rgba(var(--foreground-color), 1);
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  margin: 1.5rem;
-  border-radius: 3rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-  transition: opacity 0.2s ease;
-  z-index: 2;
-}
 .primary-action {
   display: flex;
   padding: 0.8rem 1rem;
@@ -757,10 +711,6 @@ textarea {
   }
 }
 
-#settings {
-  gap: 2rem;
-}
-
 .page {
   position: relative;
   display: flex;
@@ -769,6 +719,74 @@ textarea {
   align-content: flex-start;
   padding: 0 1.5rem;
   padding-bottom: 3rem;
+}
+
+#transactions {
+  position: relative;
+  height: 100%;
+  padding: 0 0 1.5rem 0;
+  header {
+    padding: 1rem;
+    .grid {
+      grid-template-columns: auto 1fr auto;
+    }
+  }
+}
+#flo_id_name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#token_list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.token-item {
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba(var(--text-color), 0.06);
+  border-radius: 0.5rem;
+}
+#transactions_list {
+  flex-direction: column;
+  padding-bottom: 4rem;
+}
+.transaction {
+  gap: 1rem;
+  padding: 1rem;
+  background-color: rgba(var(--text-color), 0.03);
+  border-radius: 0.3rem;
+  &:not(:last-of-type) {
+    margin-bottom: 1rem;
+  }
+  .icon {
+    fill: var(--accent-color);
+  }
+  &__receiver {
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+    color: rgba(var(--text-color), 0.8);
+  }
+  p {
+    font-size: 0.9rem;
+    max-width: unset;
+  }
+  &__time {
+    font-size: 0.8rem;
+    justify-self: flex-end;
+    color: rgba(var(--text-color), 0.8);
+  }
+}
+#scrollToTop {
+  background-color: rgba(var(--foreground-color), 1);
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin: 1.5rem;
+  border-radius: 3rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+  transition: opacity 0.2s;
+  z-index: 2;
 }
 
 #transaction-complete {
@@ -798,6 +816,10 @@ textarea {
 }
 
 @media screen and (min-width: 40rem) {
+  body {
+    background: url("back.png") no-repeat;
+    background-size: cover;
+  }
   sm-popup {
     --width: 24rem;
   }
@@ -829,6 +851,8 @@ textarea {
     overflow: hidden;
     box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.05),
       0 1rem 3rem rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(2rem);
+    background-color: rgba(var(--foreground-color), 0.9);
   }
   #main_header {
     grid-area: header;
@@ -855,7 +879,7 @@ textarea {
   .nav-item {
     aspect-ratio: 1/1;
     &__indicator {
-      width: 0.2rem;
+      width: 0.25rem;
       height: 50%;
       left: 0;
       border-radius: 0 1rem 1rem 0;

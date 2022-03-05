@@ -286,19 +286,24 @@ border: none;
     --background: rgba(var(--text-color, (17,17,17)), 0.06);
 }
 .hide{
-   opacity: 0 !important;
-   pointer-events: none !important;
+   display: none !important;
 }
-.hide-completely{
-    display: none;
+button{
+    display: flex;
+    border: none;
+    background: none;
+    padding: 0;
+    border-radius: 1rem;
+    min-width: 0;
+    cursor: pointer;
+}
+button:focus{
+    outline: var(--accent-color, teal) solid medium;
 }
 .icon {
-    fill: rgba(var(--text-color, (17,17,17)), 0.6);
     height: 1.4rem;
     width: 1.4rem;
-    border-radius: 1rem;
-    cursor: pointer;
-    min-width: 0;
+    fill: rgba(var(--text-color, (17,17,17)), 0.6);
 }
 
 :host(.round) .input{
@@ -318,6 +323,7 @@ border: none;
     background: var(--background);
     width: 100%;
     outline: none;
+    min-height: 3.5rem;
 }
 .input.readonly .clear{
     opacity: 0 !important;
@@ -335,24 +341,18 @@ border: none;
     opacity: 0.6;
 }
 .label {
+    grid-area: 1/1/2/2;
     font-size: inherit;
     opacity: .7;
     font-weight: 400;
-    position: absolute;
     top: 0;
-    -webkit-transition: -webkit-transform 0.3s;
     transition: -webkit-transform 0.3s;
-    -o-transition: transform 0.3s;
     transition: transform 0.3s;
     transition: transform 0.3s, -webkit-transform 0.3s, color .03;
-    -webkit-transform-origin: left;
-    -ms-transform-origin: left;
         transform-origin: left;
     pointer-events: none;
     white-space: nowrap;
     overflow: hidden;
-    -o-text-overflow: ellipsis;
-       text-overflow: ellipsis;
     width: 100%;
     user-select: none;
     will-change: transform;
@@ -363,12 +363,13 @@ border: none;
 }
 .container{
     width: 100%;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto;
     position: relative;
-            align-items: center;
-            flex: 1;
+    align-items: center;
 }    
 input{
+    grid-area: 1/1/2/2;
     font-size: inherit;
     border: none;
     background: transparent;
@@ -435,8 +436,11 @@ input{
         <div class="container">
             <input type="text"/>
             <div part="placeholder" class="label"></div>
+            <button class="clear hide" title="Clear">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11.414L9.172 7.757 7.757 9.172 10.586 12l-2.829 2.828 1.415 1.415L12 13.414l2.828 2.829 1.415-1.415L13.414 12l2.829-2.828-1.415-1.415L12 10.586z"/></svg>
+            </button>
         </div>
-        <svg class="icon clear hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"/><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11.414L9.172 7.757 7.757 9.172 10.586 12l-2.829 2.828 1.415 1.415L12 13.414l2.828 2.829 1.415-1.415L13.414 12l2.829-2.828-1.415-1.415L12 10.586z"/></svg>
+        <slot name="right"></slot>
     </label>
     <p class="feedback-text"></p>
 </div>
@@ -463,6 +467,7 @@ customElements.define('sm-input',
             this.reflectedAttributes = ['value', 'required', 'disabled', 'type', 'inputmode', 'readonly', 'min', 'max', 'pattern', 'minlength', 'maxlength', 'step'];
 
             this.reset = this.reset.bind(this);
+            this.clear = this.clear.bind(this);
             this.focusIn = this.focusIn.bind(this);
             this.focusOut = this.focusOut.bind(this);
             this.fireEvent = this.fireEvent.bind(this);
@@ -559,6 +564,10 @@ customElements.define('sm-input',
         reset() {
             this.value = '';
         }
+        clear() {
+            this.value = '';
+            this.input.focus();
+        }
 
         focusIn() {
             this.input.focus();
@@ -617,7 +626,7 @@ customElements.define('sm-input',
             this.animate = this.hasAttribute('animate');
             this.setAttribute('role', 'textbox');
             this.input.addEventListener('input', this.checkInput);
-            this.clearBtn.addEventListener('click', this.reset);
+            this.clearBtn.addEventListener('click', this.clear);
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
@@ -676,7 +685,7 @@ customElements.define('sm-input',
         }
         disconnectedCallback() {
             this.input.removeEventListener('input', this.checkInput);
-            this.clearBtn.removeEventListener('click', this.reset);
+            this.clearBtn.removeEventListener('click', this.clear);
         }
     })
 const smNotifications = document.createElement('template')
