@@ -686,7 +686,8 @@ textarea {
 #home {
   padding: 0;
 }
-#home > .grid {
+#home:first-child {
+  overflow-y: auto;
   align-content: flex-start;
   padding: 0.5rem 1.5rem 4rem 1.5rem;
 }
@@ -712,6 +713,7 @@ textarea {
   position: relative;
   align-content: flex-start;
   padding-bottom: 1.5rem;
+  margin-top: 1rem;
   gap: 1rem;
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 }

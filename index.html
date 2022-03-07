@@ -75,7 +75,7 @@
         </header>
         <div id="pages_container">
             <div id="home" class="page gap-2 h-100">
-                <div class="grid gap-2 h-100" style="overflow-y: auto;">
+                <div class="flex direction-column gap-2 h-100">
                     <section class="flex">
                         <button id="GenNewAddrBtn" class="button primary-action interact">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
@@ -93,7 +93,7 @@
                             Generate FLO ID
                         </button>
                     </section>
-                    <section class="grid gap-1-5">
+                    <section class="flex direction-column h-100">
                         <div class="grid align-center gap-0-5">
                             <div class="flex align-center">
                                 <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
@@ -105,18 +105,61 @@
                                 <h4>Saved FLO IDs</h4>
                             </div>
                             <p class="flex align-center">
-                                <svg class="icon" style="fill: #ffc107; margin-right: 0.3rem;"
+                                <svg class="icon margin-right-0-5" style="fill: #ffc107;"
                                     xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"
                                     fill="#000000">
                                     <path d="M0 0h24v24H0z" fill="none" />
                                     <path
                                         d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z" />
                                 </svg>
-                                Tap on saved IDs to see transactions and balance.
+                                <span id="saved_ids_tip">Click 'Add FLO ID' to add a new FLO ID.</span>
                             </p>
                         </div>
                         <ul id="saved_ids_list" class="observe-empty-state grid"></ul>
-                        <p class="empty-state">No FLO IDs added.</p>
+                        <div class="empty-state justify-center text-center align-center h-100"
+                            style="align-content: center;">
+                            <svg class="justify-self-center" style="height: 12rem;"
+                                id="bb7dac0d-c86d-4eae-9345-05ead570be6d" data-name="Layer 1"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+                                <defs>
+                                    <style>
+                                        .e4b4c873-5e79-4c66-a530-269f7775150b {
+                                            fill: rgba(var(--text-color), 0.03);
+                                        }
+
+                                        .f8c35eef-c260-42fc-be6f-7c8afb0beeeb {
+                                            fill: rgba(var(--text-color), 0.2);
+                                        }
+
+                                        .ee8c2e6d-b8f3-4b81-80ab-31d470d121b9 {
+                                            fill: rgba(var(--text-color), 0.1);
+                                        }
+                                    </style>
+                                </defs>
+                                <rect class="e4b4c873-5e79-4c66-a530-269f7775150b" x="34.76" y="40.75" width="177.53"
+                                    height="41.42" rx="4" />
+                                <circle class="f8c35eef-c260-42fc-be6f-7c8afb0beeeb" cx="57.21" cy="61.46" r="9.29" />
+                                <rect class="ee8c2e6d-b8f3-4b81-80ab-31d470d121b9" x="75.4" y="51.37" width="40.44"
+                                    height="9.03" rx="1.92" />
+                                <rect class="ee8c2e6d-b8f3-4b81-80ab-31d470d121b9" x="75.4" y="62.79" width="80.09"
+                                    height="9.03" rx="1.92" />
+                                <rect class="e4b4c873-5e79-4c66-a530-269f7775150b" x="10" y="99.29" width="177.53"
+                                    height="41.42" rx="4" />
+                                <circle class="f8c35eef-c260-42fc-be6f-7c8afb0beeeb" cx="32.45" cy="120" r="9.29" />
+                                <rect class="ee8c2e6d-b8f3-4b81-80ab-31d470d121b9" x="50.64" y="109.91" width="40.44"
+                                    height="9.03" rx="1.92" />
+                                <rect class="ee8c2e6d-b8f3-4b81-80ab-31d470d121b9" x="50.64" y="121.33" width="80.09"
+                                    height="9.03" rx="1.92" />
+                                <rect class="e4b4c873-5e79-4c66-a530-269f7775150b" x="52.47" y="157.83" width="177.53"
+                                    height="41.42" rx="4" />
+                                <circle class="f8c35eef-c260-42fc-be6f-7c8afb0beeeb" cx="74.93" cy="178.54" r="9.29" />
+                                <rect class="ee8c2e6d-b8f3-4b81-80ab-31d470d121b9" x="93.12" y="168.46" width="40.44"
+                                    height="9.03" rx="1.92" />
+                                <rect class="ee8c2e6d-b8f3-4b81-80ab-31d470d121b9" x="93.12" y="179.87" width="80.09"
+                                    height="9.03" rx="1.92" />
+                            </svg>
+                            <h4>No Saved FLO ID</h4>
+                        </div>
                     </section>
                 </div>
                 <button id="add_address_button" class="button interact fab" onclick="showPopup('add_address_popup')">
@@ -185,7 +228,7 @@
                         <ul id="transactions_list" class="flex"></ul>
                     </div>
                 </section>
-                <div class="empty-state flex justify-center align-center h-100">
+                <div class="empty-state justify-center align-center h-100">
                     <div class="grid justify-center text-center gap-1">
                         <sm-spinner></sm-spinner>
                         <span>Loading transactions</span>
@@ -838,7 +881,6 @@
                             getRef('token_list').append(frag)
                             getRef('tokens').classList.remove('hide')
                         }
-                        scrollToTopObserver.observe(getRef('tokens'))
                     }).catch(e => {
                         console.error(e)
                     })
@@ -933,7 +975,7 @@
         // class based lazy loading
         class LazyLoader {
             constructor(container, elementsToRender, renderFn, options = {}) {
-                const { batchSize = 10 } = options
+                const { batchSize = 10, freshRender } = options
 
                 this.elementsToRender = elementsToRender
                 this.arrayOfElements = (typeof elementsToRender === 'function') ? this.elementsToRender() : elementsToRender || []
@@ -941,6 +983,7 @@
                 this.intersectionObserver
 
                 this.batchSize = batchSize
+                this.freshRender = freshRender
 
                 this.lazyContainer = document.querySelector(container)
 
@@ -994,6 +1037,9 @@
                     frag.append(this.renderFn(this.arrayOfElements[index]))
                 }
                 this.lazyContainer.append(frag)
+                // Callback to be called if elements are updated or rendered for first time
+                if (!lazyLoad && this.freshRender)
+                    this.freshRender()
             }
             clear() {
                 this.intersectionObserver.disconnect()
@@ -1062,7 +1108,9 @@
             transactionCard(details) {
                 const { sender, receiver, floData, time, txid } = details
                 const clone = getRef('transaction_template').content.cloneNode(true).firstElementChild;
-                if (pagesData.params.id === sender) {
+                if (sender === receiver) {
+                    clone.querySelector('.transaction__icon').innerHTML = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><title>sender and receiver is same</title><path d="M.01 0h24v24h-24V0z" fill="none"/><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>`;
+                } else if (pagesData.params.id === sender) {
                     clone.querySelector('.transaction__icon').innerHTML = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 5v2h6.59L4 18.59 5.41 20 17 8.41V15h2V5z"/></svg>`;
                 } else {
                     clone.querySelector('.transaction__icon').innerHTML = `<svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 5.41L18.59 4 7 15.59V9H5v10h10v-2H8.41z"/></svg>`;
@@ -1087,7 +1135,13 @@
                     if (transactionsLazyLoader) {
                         transactionsLazyLoader.update(allTransactions)
                     } else {
-                        transactionsLazyLoader = new LazyLoader('#transactions_list', allTransactions, render.transactionCard)
+                        transactionsLazyLoader = new LazyLoader('#transactions_list', allTransactions, render.transactionCard, {
+                            freshRender() {
+                                scrollToTopObserver.disconnect()
+                                if (getRef('transactions_list').firstElementChild)
+                                    scrollToTopObserver.observe(getRef('transactions_list').firstElementChild)
+                            }
+                        })
                         transactionsLazyLoader.init()
                     }
                     getRef('transactions_scroller').classList.remove('hide')
@@ -1146,7 +1200,7 @@
         const scrollToTopObserver = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    animateTo(getRef('scroll_to_top'), [
+                    getRef('scroll_to_top').animate([
                         {
                             transform: 'translateY(0)',
                             opacity: 1
@@ -1156,14 +1210,14 @@
                             opacity: 0
                         },
                     ], {
-                        duration: 100,
+                        duration: 150,
                         easing: 'ease',
                     }).onfinish = () => {
                         getRef('scroll_to_top').classList.add('hide')
                     }
                 } else {
                     getRef('scroll_to_top').classList.remove('hide')
-                    animateTo(getRef('scroll_to_top'), [
+                    getRef('scroll_to_top').animate([
                         {
                             transform: 'translateY(1rem)',
                             opacity: 0
@@ -1173,7 +1227,7 @@
                             opacity: 1
                         },
                     ], {
-                        duration: 100,
+                        duration: 150,
                         easing: 'ease'
                     })
                 }
@@ -1248,6 +1302,17 @@
             }
         })
 
+        const savedIdsObserver = new MutationObserver((mutationList) => {
+            mutationList.forEach(mutation => {
+                getRef('saved_ids_tip').textContent = mutation.target.children.length === 0 ? `Click 'Add FLO ID' to add a new FLO ID.` : `Tap on saved IDs to see transactions and balance.`
+            })
+        })
+
+        savedIdsObserver.observe(getRef('saved_ids_list'), {
+            childList: true,
+        })
+
+
         function saveFloId() {
             const floID = getRef('floAddr').value.trim()
             let name = getRef('addrLabel').value.trim();
@@ -1292,7 +1357,7 @@
                 confirmText: 'Delete',
             }).then(res => {
                 if (res) {
-                    const toDelete = getRef('saved_ids_list').querySelector(`.saved - id[data - flo - id="${getRef('edit_saved_id').value}"]`)
+                    const toDelete = getRef('saved_ids_list').querySelector(`.saved-id[data-flo-id="${getRef('edit_saved_id').value}"]`)
                     if (toDelete)
                         toDelete.remove();
                     compactIDB.removeData('labels', getRef('edit_saved_id').value);
@@ -1313,6 +1378,7 @@
             const floData = getRef('flo_data_textarea').value.trim();
             const privKey = getRef('get_private_key_field').value.trim();
             setTimeout(() => {
+
 
             }, 2000);
             // floWebWallet.sendTransaction(sender, receiver, amount, floData, privKey).then((transactionId) => {
