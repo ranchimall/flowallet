@@ -686,6 +686,7 @@ textarea {
   border-radius: 0.3rem;
   padding: 0.5rem;
   background-color: rgba(var(--text-color), 0.03);
+  user-select: none;
   &.highlight {
     box-shadow: 0 0 0.1rem 0.1rem var(--accent-color) inset;
   }

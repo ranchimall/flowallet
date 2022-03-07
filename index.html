@@ -183,7 +183,8 @@
                             </svg>
                         </a>
                         <h4 id="flo_id_name"></h4>
-                        <button class="icon-only" style="margin-left:auto" onclick="refreshData()">
+                        <button class="icon-only" style="margin-left:auto"
+                            onclick="render.transactions(pagesData.params.id)">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                                 width="24px" fill="#000000">
                                 <path d="M0 0h24v24H0z" fill="none" />
@@ -891,41 +892,12 @@
                 pagesData.params = params
             switch (pageId) {
                 case 'transactions':
-                    // retrieve tokens and render them
-                    getRef('tokens').classList.add('hide')
-                    fetch(`https://ranchimallflo.duckdns.org/api/v1.0/getFloAddressBalance?floAddress=${params.id}`).then(res => res.json()).then(({ floAddressBalances }) => {
-                        const frag = document.createDocumentFragment()
-                        getRef('token_list').innerHTML = ''
-                        let hasTokens = false
-                        for (const token in floAddressBalances) {
-                            hasTokens = true
-                            frag.append(createElement('li', {
-                                className: 'token-item',
-                                innerHTML: `<span>${token}: </span><span>${floAddressBalances[token].balance}</span>`
-                            }))
-                        }
-                        if (hasTokens) {
-                            getRef('token_list').append(frag)
-                            getRef('tokens').classList.remove('hide')
-                        }
-                    }).catch(e => {
-                        console.error(e)
-                    })
-                    // retrieve FLO balance
-                    getRef('flo_balance').innerHTML = `<sm-spinner></sm-spinner>`;
-                    floWebWallet.getBalance(params.id).then((retrievedBal) => {
-                        getRef('flo_balance').textContent = `${parseFloat(retrievedBal.toFixed(3))} FLO`;
-                    }).catch((error) => {
-                        console.log(error);
-                    })
-                    floWebWallet.getLabels().then(allLabels => {
-                        getRef('flo_id_name').textContent = allLabels.hasOwnProperty(params.id) ? allLabels[params.id] === 'Unknown' ? params.id : allLabels[params.id] : params.id
-                    })
                     render.transactions(params.id).then(() => {
                         scrollToTopObserver.observe(getRef('transactions_hero_section'))
                     })
                     break;
                 default:
+                    getRef('transactions_list').innerHTML = ''
                     scrollToTopObserver.disconnect()
             }
             const animOptions = {
@@ -973,7 +945,7 @@
                         moveBy = ((currentActiveElementDimensions.height - indicatorDimensions.height) / 2) + indicatorDimensions.height
                     }
                     indicatorObserver.observe(previousIndicator)
-                    animateTo(previousIndicator, [
+                    previousIndicator.animate([
                         {
                             transform: 'none',
                             opacity: 1,
@@ -1019,7 +991,7 @@
             }
             document.querySelectorAll('.page').forEach(page => page.classList.add('hide'))
             getRef(pageId).classList.remove('hide')
-            animateTo(getRef(pageId), [{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards', easing: 'ease' })
+            getRef(pageId).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards', easing: 'ease' })
         }
 
         const indicatorObserver = new IntersectionObserver(entries => {
@@ -1027,7 +999,7 @@
                 if (!entry.isIntersecting) {
                     const { currentActiveElement, currentIndicator, isOnTop, animOptions, moveBy } = tempData
                     currentActiveElement.append(currentIndicator)
-                    animateTo(currentIndicator, [
+                    currentIndicator.animate([
                         {
                             transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `-${moveBy}px` : `${moveBy}px`})`,
                             opacity: 0,
@@ -1194,6 +1166,38 @@
             },
             async transactions(floID) {
                 try {
+                    scrollToTopObserver.disconnect()
+                    // retrieve tokens and render them
+                    getRef('tokens').classList.add('hide')
+                    fetch(`https://ranchimallflo.duckdns.org/api/v1.0/getFloAddressBalance?floAddress=${floID}`).then(res => res.json()).then(({ floAddressBalances }) => {
+                        const frag = document.createDocumentFragment()
+                        getRef('token_list').innerHTML = ''
+                        let hasTokens = false
+                        for (const token in floAddressBalances) {
+                            hasTokens = true
+                            frag.append(createElement('li', {
+                                className: 'token-item',
+                                innerHTML: `<span>${token}: </span><span>${floAddressBalances[token].balance}</span>`
+                            }))
+                        }
+                        if (hasTokens) {
+                            getRef('token_list').append(frag)
+                            getRef('tokens').classList.remove('hide')
+                        }
+                    }).catch(e => {
+                        console.error(e)
+                    })
+                    // retrieve FLO balance
+                    getRef('flo_balance').innerHTML = `<sm-spinner></sm-spinner>`;
+                    floWebWallet.getBalance(floID).then((retrievedBal) => {
+                        getRef('flo_balance').textContent = `${parseFloat(retrievedBal.toFixed(3))} FLO`;
+                    }).catch((error) => {
+                        notify(error, 'error');
+                    })
+                    floWebWallet.getLabels().then(allLabels => {
+                        getRef('flo_id_name').textContent = allLabels.hasOwnProperty(floID) ? allLabels[floID] === 'Unknown' ? floID : allLabels[floID] : floID
+                    })
+                    // render transactions
                     getRef('transactions_scroller').nextElementSibling.classList.remove('hide')
                     getRef('transactions_scroller').classList.add('hide')
                     getRef('transactions_list').innerHTML = '';
