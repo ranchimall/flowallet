@@ -201,7 +201,7 @@ customElements.define('sm-form', class extends HTMLElement {
         }
     }
     handleKeydown(e) {
-        if (e.key === 'Enter' && e.target.tagName !== 'SM-TEXTAREA') {
+        if (e.key === 'Enter' && !e.target.tagName.includes('TEXTAREA')) {
             if (this.allRequiredValid) {
                 if (this.submitButton) {
                     this.submitButton.click()
@@ -282,7 +282,6 @@ border: none;
     --danger-color: red;
     --width: 100%;
     --icon-gap: 0.5rem;
-    --border-radius: 0.3rem;
     --background: rgba(var(--text-color, (17,17,17)), 0.06);
 }
 .hide{
@@ -318,7 +317,7 @@ button:focus{
     position: relative;
     gap: var(--icon-gap);
     padding: var(--padding, 0.6rem 0.8rem);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius,0.3rem);
     transition: opacity 0.3s, box-shadow 0.2s;
     background: var(--background);
     width: 100%;
