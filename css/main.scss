@@ -570,6 +570,9 @@ textarea {
 #main_navbar {
   display: flex;
   background: rgba(var(--text-color), 0.03);
+  &.hide-away {
+    position: absolute;
+  }
   ul {
     display: flex;
     height: 100%;
@@ -758,7 +761,7 @@ textarea {
   font-size: 0.9rem;
   padding: 0.5rem 1rem;
   background-color: rgba(var(--text-color), 0.06);
-  border-radius: 0.5rem;
+  border-radius: 0.3rem;
 }
 #transactions_list {
   flex-direction: column;
@@ -799,7 +802,6 @@ textarea {
   bottom: 0;
   margin: 1.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-  transition: opacity 0.2s;
   z-index: 2;
 }
 #scroll_to_top {
@@ -866,6 +868,13 @@ textarea {
 }
 
 @media screen and (max-width: 40rem) {
+  #main_navbar {
+    &.hide-away {
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  }
 }
 @media screen and (min-width: 40rem) {
   body {
@@ -898,7 +907,7 @@ textarea {
     overflow: hidden;
     box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.05),
       0 1rem 3rem rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(2rem);
+    // backdrop-filter: blur(2rem);
     background-color: rgba(var(--foreground-color), 0.9);
   }
   #main_header {
