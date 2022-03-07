@@ -74,7 +74,7 @@
             <theme-toggle></theme-toggle>
         </header>
         <div id="pages_container">
-            <div id="home" class="page gap-2 h-100">
+            <div id="home" class="page flex h-100">
                 <div class="flex direction-column gap-2 h-100">
                     <section class="flex">
                         <button id="GenNewAddrBtn" class="button primary-action interact">
@@ -193,20 +193,46 @@
                         </button>
                     </div>
                 </header>
-                <section id="transactions_scroller" class="grid gap-1-5" style="overflow-y: auto;padding: 0 1.5rem;">
-                    <div id="tokens" class="grid gap-1 hide">
+                <section id="transactions_scroller" class="grid gap-2" style="overflow-y: auto;padding: 0 1.5rem;">
+                    <div class="grid gap-2"
+                        style="background-color: rgba(var(--text-color), 0.03); padding: 1.5rem 1rem; border-radius: 0.5rem;">
                         <div class="flex align-center">
-                            <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
-                                viewBox="0 0 24 24" width="24px" fill="#000000">
-                                <path d="M0 0h24v24H0V0z" fill="none" />
-                                <path
-                                    d="M15 4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" />
-                                <path
-                                    d="M3 12c0-2.61 1.67-4.83 4-5.65V4.26C3.55 5.15 1 8.27 1 12s2.55 6.85 6 7.74v-2.09c-2.33-.82-4-3.04-4-5.65z" />
+                            <svg class="icon margin-right-0-5" viewBox="0 0 48 48"
+                                style="enable-background:new 0 0 107.65 47.07;" xml:space="preserve">
+                                <path class="flo-logo"
+                                    d="M34.2,32.4c0,0,3.75-0.18,7.41-3.86c2.96-2.98,3.65-6.66,3.99-8.52c-11.04-0.63-12.36,0.99-13.71,1.68
+                                                    c-1.19,0.61-5.33,4.55-5.33,4.55s3.06-3.13,3.2-9.94c0.09-4.54-1.02-7.39-2.72-10.64C25.29,2.33,22.79,0,22.79,0l0.01,4.97
+                                                    c0,0,4.35,2.84,4.35,11.84c0,6.52-4.35,11.02-4.35,11.02s-4.35-4.5-4.35-11.02c0-9.01,4.35-11.84,4.35-11.84L22.79,0
+                                                    c0,0-2.48,2.33-4.23,5.67c-1.7,3.25-2.81,6.1-2.72,10.64c0.13,6.81,3.2,9.94,3.2,9.94s-4.14-3.95-5.33-4.55
+                                                    c-1.35-0.69-2.67-2.31-13.71-1.68c0.34,1.86,1.03,5.54,3.99,8.52c3.66,3.68,7.41,3.86,7.41,3.86s-5.05-2.03-7.15-9.45
+                                                    c0,0,5.76-0.7,9.63,1.87c2.52,1.67,4.86,4.26,6.79,6.01c0,0-2.58-0.04-6.81,1.88c-2.54,1.15-3.92,2.84-4.44,4.38
+                                                    c-0.36,1.06-0.2,2.27-0.2,2.27s3.31,0.31,5.94,0c1.99-0.23,3.42-2.16,3.42-2.16s-2,0.78-3.95,0.78c-2.06,0-2.67-0.66-2.67-0.66
+                                                    c0.98-3.64,8.68-5.19,8.68-5.19s-1.34,2.6-1.42,6.5c-0.1,4.79,3.57,8.52,3.57,8.45c0,0.07,3.67-3.66,3.57-8.45
+                                                    c-0.08-3.9-1.42-6.5-1.42-6.5s7.71,1.55,8.68,5.19c0,0-0.61,0.66-2.67,0.66c-1.95,0-3.95-0.78-3.95-0.78s1.43,1.93,3.42,2.16
+                                                    c2.63,0.31,5.94,0,5.94,0s0.16-1.21-0.2-2.27c-0.52-1.54-1.9-3.23-4.44-4.38c-4.23-1.92-6.81-1.88-6.81-1.88
+                                                    c1.93-1.76,4.27-4.34,6.79-6.01c3.87-2.57,9.63-1.87,9.63-1.87C39.26,30.38,34.2,32.4,34.2,32.4z M22.8,43.06
+                                                    c-0.95-1.37-1.47-2.13-1.47-4.26c0-2.4,1.12-4.61,1.47-5.14c0.35,0.52,1.47,2.74,1.47,5.14C24.27,40.92,23.75,41.69,22.8,43.06z">
+                                </path>
                             </svg>
-                            <h5>Tokens owned</h5>
+                            <div class="grid gap-0-5">
+                                <h5>FLO balance</h5>
+                                <span id="flo_balance"></span>
+                            </div>
                         </div>
-                        <ul id="token_list"></ul>
+                        <div id="tokens" class="grid gap-0-5 hide">
+                            <div class="flex align-center">
+                                <svg class="icon margin-right-0-5" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                    viewBox="0 0 24 24" width="24px" fill="#000000">
+                                    <path d="M0 0h24v24H0V0z" fill="none" />
+                                    <path
+                                        d="M15 4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" />
+                                    <path
+                                        d="M3 12c0-2.61 1.67-4.83 4-5.65V4.26C3.55 5.15 1 8.27 1 12s2.55 6.85 6 7.74v-2.09c-2.33-.82-4-3.04-4-5.65z" />
+                                </svg>
+                                <h5>Tokens owned</h5>
+                            </div>
+                            <ul id="token_list"></ul>
+                        </div>
                     </div>
                     <div class="grid gap-0-5">
                         <div id="transactions_header" class="flex align-center space-between sticky top-0"
@@ -865,6 +891,7 @@
                 pagesData.params = params
             switch (pageId) {
                 case 'transactions':
+                    // retrieve tokens and render them
                     getRef('tokens').classList.add('hide')
                     fetch(`https://ranchimallflo.duckdns.org/api/v1.0/getFloAddressBalance?floAddress=${params.id}`).then(res => res.json()).then(({ floAddressBalances }) => {
                         const frag = document.createDocumentFragment()
@@ -883,6 +910,13 @@
                         }
                     }).catch(e => {
                         console.error(e)
+                    })
+                    // retrieve FLO balance
+                    getRef('flo_balance').innerHTML = `<sm-spinner></sm-spinner>`;
+                    floWebWallet.getBalance(params.id).then((retrievedBal) => {
+                        getRef('flo_balance').textContent = `${parseFloat(retrievedBal.toFixed(3))} FLO`;
+                    }).catch((error) => {
+                        console.log(error);
                     })
                     floWebWallet.getLabels().then(allLabels => {
                         getRef('flo_id_name').textContent = allLabels.hasOwnProperty(params.id) ? allLabels[params.id] === 'Unknown' ? params.id : allLabels[params.id] : params.id
