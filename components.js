@@ -344,7 +344,6 @@ button:focus{
     font-size: inherit;
     opacity: .7;
     font-weight: 400;
-    top: 0;
     transition: -webkit-transform 0.3s;
     transition: transform 0.3s;
     transition: transform 0.3s, -webkit-transform 0.3s, color .03;
@@ -373,19 +372,19 @@ input{
     border: none;
     background: transparent;
     outline: none;
-    color: rgba(var(--text-color, (17,17,17)), 1);
+    color: inherit;
     width: 100%;
     caret-color: var(--accent-color, teal);
 }
 :host([animate]) .input:focus-within .container input,
-.animate-label .container input {
+.animate-placeholder .container input {
     -webkit-transform: translateY(0.6rem);
             -ms-transform: translateY(0.6rem);
         transform: translateY(0.6rem);
     }
   
     :host([animate]) .input:focus-within .label,
-    .animate-label .label {
+    .animate-placeholder .label {
     -webkit-transform: translateY(-0.7em) scale(0.8);
             -ms-transform: translateY(-0.7em) scale(0.8);
         transform: translateY(-0.7em) scale(0.8);
@@ -396,7 +395,7 @@ input{
     box-shadow: 0 0 0 1px var(--border-color, rgba(var(--text-color, (17,17,17)), 0.3)) inset;
     background: rgba(var(--background-color, (255,255,255)), 1);
 }
-.animate-label:focus-within:not(.readonly) .label{
+.animate-placeholder:focus-within:not(.readonly) .label{
     color: var(--accent-color,teal)
 }
 .feedback-text:not(:empty){
@@ -596,12 +595,12 @@ customElements.define('sm-input',
             if (!this.hasAttribute('placeholder') || this.getAttribute('placeholder').trim() === '') return;
             if (this.input.value !== '') {
                 if (this.animate)
-                    this.inputParent.classList.add('animate-label');
+                    this.inputParent.classList.add('animate-placeholder');
                 else
                     this.label.classList.add('hide');
             } else {
                 if (this.animate)
-                    this.inputParent.classList.remove('animate-label');
+                    this.inputParent.classList.remove('animate-placeholder');
                 else
                     this.label.classList.remove('hide');
                 this.feedbackText.textContent = '';
@@ -2472,3 +2471,222 @@ customElements.define('strip-option', class extends HTMLElement {
         this.removeEventListener('keydown', this.handleKeyDown);
     }
 });
+const smTextarea = document.createElement('template')
+smTextarea.innerHTML = `
+<style>
+*,
+*::before,
+*::after { 
+    padding: 0;
+    margin: 0;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+} 
+::-moz-focus-inner{
+    border: none;
+}
+.hide{
+    display: none !important;
+ }
+:host{
+    display: grid;
+    --danger-color: red;
+    --border-radius: 0.3rem;
+    --background: rgba(var(--text-color,(17,17,17)), 0.06);
+}
+.textarea{
+    display: grid;
+    position: relative;
+    cursor: text;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    max-height: var(--max-height, 12rem);
+    background: var(--background);
+    border-radius: var(--border-radius);
+    padding: var(--padding, 1rem 0.8rem);
+}
+.textarea::after,
+textarea{
+    width: 100%;
+    min-width: 1em;
+    font: inherit;
+    color: inherit;
+    resize: none;
+    grid-area: 1/1/2/2;
+    justify-self: stretch;
+    background: none;
+    appearance: none;
+    border: none;
+    outline: none;
+    line-height: 1.5;
+    overflow: hidden;
+    caret-color: var(--accent-color, teal);
+}
+.textarea::after{
+    content: attr(data-value) ' ';
+    visibility: hidden;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+.readonly{
+    pointer-events: none;
+}
+.textarea:focus-within:not(.readonly){
+    box-shadow: 0 0 0 0.1rem var(--accent-color,teal) inset;
+}
+.placeholder{
+    grid-area: 1/1/2/2;
+    font-size: inherit;
+    opacity: .7;
+    font-weight: 400;
+    transition: -webkit-transform 0.3s;
+    transition: transform 0.3s;
+    transition: transform 0.3s, -webkit-transform 0.3s, color .03;
+        transform-origin: left;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    user-select: none;
+    will-change: transform;
+}
+:host([disabled]) .textarea{
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+:host([animate]) .textarea:focus-within textarea,
+.animate-placeholder  textarea {
+    transform: translateY(0.8rem);
+    }
+  
+    :host([animate]) .textarea:focus-within .placeholder,
+    .animate-placeholder .placeholder {
+        opacity: 1;
+        transform: translateY(-1rem) scale(0.8);
+        color: var(--accent-color);
+}
+:host([variant="outlined"]) .textarea {
+    box-shadow: 0 0 0 1px var(--border-color, rgba(var(--text-color, (17,17,17)), 0.3)) inset;
+    background: rgba(var(--background-color, (255,255,255)), 1);
+}
+.animate-placeholder:focus-within:not(.readonly) .placeholder{
+    color: var(--accent-color,teal)
+}
+@media (any-hover: hover){
+    ::-webkit-scrollbar{
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+    
+    ::-webkit-scrollbar-thumb{
+        background: rgba(var(--text-color,(17,17,17)), 0.3);
+        border-radius: 1rem;
+        &:hover{
+            background: rgba(var(--text-color,(17,17,17)), 0.5);
+        }
+    }
+}
+</style>
+<label class="textarea" part="textarea">
+    <span class="placeholder"></span>
+    <textarea rows="1"></textarea>
+</label>
+`;
+customElements.define('sm-textarea',
+    class extends HTMLElement {
+        constructor() {
+            super()
+            this.attachShadow({
+                mode: 'open'
+            }).append(smTextarea.content.cloneNode(true))
+
+            this.textarea = this.shadowRoot.querySelector('textarea')
+            this.textareaBox = this.shadowRoot.querySelector('.textarea')
+            this.placeholder = this.shadowRoot.querySelector('.placeholder')
+            this.reflectedAttributes = ['disabled', 'required', 'readonly', 'rows', 'minlength', 'maxlength']
+
+            this.reset = this.reset.bind(this)
+            this.focusIn = this.focusIn.bind(this)
+            this.fireEvent = this.fireEvent.bind(this)
+            this.checkInput = this.checkInput.bind(this)
+        }
+        static get observedAttributes() {
+            return ['disabled', 'value', 'placeholder', 'required', 'readonly', 'rows', 'minlength', 'maxlength']
+        }
+        get value() {
+            return this.textarea.value
+        }
+        set value(val) {
+            this.setAttribute('value', val)
+            this.fireEvent()
+        }
+        get disabled() {
+            return this.hasAttribute('disabled')
+        }
+        set disabled(val) {
+            if (val) {
+                this.setAttribute('disabled', '')
+            } else {
+                this.removeAttribute('disabled')
+            }
+        }
+        get isValid() {
+            return this.textarea.checkValidity()
+        }
+        reset() {
+            this.setAttribute('value', '')
+        }
+        focusIn() {
+            this.textarea.focus()
+        }
+        fireEvent() {
+            let event = new Event('input', {
+                bubbles: true,
+                cancelable: true,
+                composed: true
+            });
+            this.dispatchEvent(event);
+        }
+        checkInput() {
+            if (!this.hasAttribute('placeholder') || this.getAttribute('placeholder') === '')
+                return;
+            if (this.textarea.value !== '') {
+                if (this.hasAttribute('animate'))
+                    this.textareaBox.classList.add('animate-placeholder')
+                else
+                    this.placeholder.classList.add('hide')
+
+            } else {
+                if (this.hasAttribute('animate'))
+                    this.textareaBox.classList.remove('animate-placeholder')
+                else
+                    this.placeholder.classList.remove('hide')
+            }
+        }
+        connectedCallback() {
+            this.textarea.addEventListener('input', e => {
+                this.textareaBox.dataset.value = this.textarea.value
+                this.checkInput()
+            })
+        }
+        attributeChangedCallback(name, oldValue, newValue) {
+            if (this.reflectedAttributes.includes(name)) {
+                if (this.hasAttribute(name)) {
+                    this.textarea.setAttribute(name, this.getAttribute(name) ? this.getAttribute(name) : '')
+                }
+                else {
+                    this.textContent.removeAttribute(name)
+                }
+            }
+            else if (name === 'placeholder') {
+                this.placeholder.textContent = this.getAttribute('placeholder')
+            }
+            else if (name === 'value') {
+                this.textarea.value = newValue;
+                this.textareaBox.dataset.value = newValue
+                this.checkInput()
+            }
+        }
+    })
