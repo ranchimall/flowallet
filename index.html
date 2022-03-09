@@ -1437,12 +1437,17 @@
             if (name == '')
                 name = 'Unknown'
             compactIDB.addData('labels', name, floID).then((resolve) => {
-                [...getRef('saved_ids_list').children].some(child => {
-                    if (child.dataset.name.localeCompare(name) > 0) {
-                        child.before(render.savedIdCard(floID, name))
-                        return true
-                    }
-                })
+                if (getRef('saved_ids_list').children.length > 0) {
+                    getRef('saved_ids_list').append(render.savedIdCard(floID, name))
+
+                } else {
+                    [...getRef('saved_ids_list').children].some(child => {
+                        if (child.dataset.name.localeCompare(name) > 0) {
+                            child.before(render.savedIdCard(floID, name))
+                            return true
+                        }
+                    })
+                }
                 hidePopup()
             }).catch((error) => {
                 notify('FLO ID already saved', 'error');
