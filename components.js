@@ -1353,7 +1353,7 @@ customElements.define('sm-popup', class extends HTMLElement {
     }
 
     updateFocusableList() {
-        this.focusable = this.querySelectorAll('sm-button:not([disabled]), button:not([disabled]), [href], sm-input, input, sm-select, select, sm-checkbox, sm-textarea, textarea, [tabindex]:not([tabindex="-1"])')
+        this.focusable = this.querySelectorAll('sm-button:not([disabled]), button:not([disabled]), [href], sm-input, input:not([readonly]), sm-select, select, sm-checkbox, sm-textarea, textarea, [tabindex]:not([tabindex="-1"])')
         this.autoFocus = this.querySelector('[autofocus]')
     }
 

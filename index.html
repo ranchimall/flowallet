@@ -308,7 +308,8 @@
                         </sm-input>
                     </div>
                     <div class="grid gap-1">
-                        <sm-input id="amount" type="number" placeholder="Amount" error-text="Invalid amount" animate>
+                        <sm-input id="amount" type="number" placeholder="Amount" step="0.00001"
+                            error-text="Invalid amount" animate required>
                         </sm-input>
                         <sm-textarea id="flo_data_textarea" placeholder="FLO data" rows="6" maxlength="1040" animate>
                         </sm-textarea>
@@ -550,7 +551,7 @@
             <sm-form>
                 <sm-input id="get_private_key_field" type="password" required autofocus>
                     <label slot="right" class="interact">
-                        <input type="checkbox" id="private_key_visibility" class="hide"
+                        <input type="checkbox" id="private_key_visibility" class="hide" readonly
                             onchange="togglePrivateKeyVisibility()">
                         <svg class="icon invisible" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
                             width="24px" fill="#000000">
