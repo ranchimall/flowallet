@@ -1459,6 +1459,9 @@
 
         getRef('getBal_addr').addEventListener('input', debounce(e => {
             getRef('getBal_btn').disabled = !e.target.isValid
+            if (!e.target.isValid) {
+                getRef('sender_balance').textContent = ``;
+            }
         }, 100))
 
         function checkSenderBalance() {
@@ -1468,7 +1471,7 @@
             }).catch((error) => {
                 console.error(error);
             }).finally(() => {
-                getRef('getBal_btn').disabled = false;
+                getRef('getBal_btn').disabled = true;
             })
         }
 
