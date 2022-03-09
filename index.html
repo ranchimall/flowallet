@@ -1438,23 +1438,23 @@
             if (name == '')
                 name = 'Unknown'
             compactIDB.addData('labels', name, floID).then((resolve) => {
-                if (getRef('saved_ids_list').children.length === 0) {
-                    getRef('saved_ids_list').append(render.savedIdCard(floID, name))
-
-                } else {
-                    [...getRef('saved_ids_list').children].some(child => {
-                        if (child.dataset.name.localeCompare(name) > 0) {
-                            child.before(render.savedIdCard(floID, name))
-                            return true
-                        } else {
-                            getRef('saved_ids_list').append(render.savedIdCard(floID, name))
-                        }
-                    })
-                }
+                insertElementAlphabetically(name, render.savedIdCard(floID, name))
                 hidePopup()
             }).catch((error) => {
                 notify('FLO ID already saved', 'error');
             })
+        }
+
+        function insertElementAlphabetically(name, elementToInsert) {
+            const elementInserted = [...getRef('saved_ids_list').children].some(child => {
+                if (child.dataset.name.localeCompare(name) > 0) {
+                    child.before(elementToInsert)
+                    return true
+                }
+            })
+            if (!elementInserted) {
+                getRef('saved_ids_list').append(elementToInsert)
+            }
         }
 
         getRef('getBal_addr').addEventListener('input', debounce(e => {
@@ -1486,12 +1486,7 @@
                     // place the renamed card in alphabetically correct position
                     const clone = potentialTarget.cloneNode(true);
                     potentialTarget.remove();
-                    [...getRef('saved_ids_list').children].some(child => {
-                        if (child.dataset.name.localeCompare(name) > 0) {
-                            child.before(clone)
-                            return true
-                        }
-                    })
+                    insertElementAlphabetically(name, clone)
                 }
                 hidePopup()
             }).catch((error) => {
