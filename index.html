@@ -386,7 +386,7 @@
                         <span class="nav-item__title">Send</span>
                     </a>
                 </li>
-                <li>
+                <!-- <li>
                     <a href="#/vault" class="nav-item interact" title='Send FLO data'>
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
                             height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
@@ -400,7 +400,7 @@
                         </svg>
                         <span class="nav-item__title">Vault</span>
                     </a>
-                </li>
+                </li> -->
                 <li>
                     <a href="#/settings" class="nav-item interact">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
@@ -731,10 +731,10 @@
             switch (e.target.id) {
                 case 'saved_ids_popup':
                     const frag = document.createDocumentFragment()
-                    const allSavedIds = await floWebWallet.getLabels()
-                    for (const floID in allSavedIds) {
-                        frag.append(render.savedIdPickerCard(floID, allSavedIds[floID]))
-                    }
+                    const allSavedIds = await getArrayOfSavedIds()
+                    allSavedIds.forEach(({ floID, name }) => {
+                        frag.append(render.savedIdPickerCard(floID, name))
+                    })
                     getRef('saved_ids_picker_list').innerHTML = ''
                     getRef('saved_ids_picker_list').append(frag)
                     getRef('search_saved_ids_picker').focusIn()
@@ -1178,8 +1178,8 @@
             async savedIds() {
                 const frag = document.createDocumentFragment()
                 try {
-                    const allSavedIds = await floWebWallet.getLabels();
-                    Object.entries(allSavedIds).sort((a, b) => a[1].localeCompare(b[1])).forEach(([floID, name]) => {
+                    const allSavedIds = await getArrayOfSavedIds();
+                    allSavedIds.forEach(({ floID, name }) => {
                         frag.append(render.savedIdCard(floID, name))
                     })
                     getRef('saved_ids_list').innerHTML = '';
@@ -1388,7 +1388,7 @@
                     name: savedIds[key]
                 })
             }
-            return arr
+            return arr.sort((a, b) => a.name.localeCompare(b.name))
         }
 
         getRef('search_saved_ids_picker').addEventListener('input', debounce(async e => {
