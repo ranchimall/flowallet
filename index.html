@@ -308,7 +308,7 @@
                         </sm-input>
                     </div>
                     <div class="grid gap-1">
-                        <sm-input id="amount" type="number" placeholder="Amount" step="0.00001"
+                        <sm-input id="amount" type="number" placeholder="Amount" step="0.00001" min="0.00001"
                             error-text="Invalid amount" animate required>
                         </sm-input>
                         <sm-textarea id="flo_data_textarea" placeholder="FLO data" rows="6" maxlength="1040" animate>
@@ -1446,6 +1446,8 @@
                         if (child.dataset.name.localeCompare(name) > 0) {
                             child.before(render.savedIdCard(floID, name))
                             return true
+                        } else {
+                            getRef('saved_ids_list').append(render.savedIdCard(floID, name))
                         }
                     })
                 }
