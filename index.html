@@ -1437,7 +1437,7 @@
             if (name == '')
                 name = 'Unknown'
             compactIDB.addData('labels', name, floID).then((resolve) => {
-                if (getRef('saved_ids_list').children.length > 0) {
+                if (getRef('saved_ids_list').children.length === 0) {
                     getRef('saved_ids_list').append(render.savedIdCard(floID, name))
 
                 } else {
