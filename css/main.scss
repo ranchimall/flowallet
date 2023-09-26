@@ -25,7 +25,6 @@ body {
   scrollbar-gutter: stable;
   color: rgba(var(--text-color), 1);
   background-color: rgba(var(--background-color), 1);
-  transition: background-color 0.3s;
   // Accent colors
   --dark-red: #d40e1e;
   --red: #f50000;
@@ -580,7 +579,6 @@ h3 {
   height: 100%;
   width: 100%;
   background-color: rgba(var(--foreground-color), 1);
-  transition: background-color 0.3s;
 }
 #pages_container {
   flex: 1;
@@ -616,9 +614,7 @@ h3 {
   font-size: 0.7rem;
   border-radius: 0.3rem;
   text-align: center;
-  .icon {
-    transition: transform 0.2s;
-  }
+  .icon,
   &__title {
     transition: opacity 0.2s, transform 0.2s;
   }
@@ -636,7 +632,11 @@ h3 {
     background: var(--accent-color);
     border-radius: 1rem 1rem 0 0;
     z-index: 1;
+    view-transition-name: indicator;
   }
+}
+::view-transition {
+  transition: 0.3s;
 }
 
 #fix_invalid_button {
@@ -1204,6 +1204,9 @@ legend,
     transform: translateX(-50%);
     width: calc(100vw - 2rem);
     flex-wrap: wrap;
+    &:empty {
+      display: none !important;
+    }
   }
 }
 @media screen and (min-width: 40rem) {

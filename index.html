@@ -54,7 +54,7 @@
                         routeTo(window.location.hash, { firstLoad: true })
                     }).catch(e => {
                         console.error(e)
-                        routeTo(window.location.hash, { firstLoad: true, smartContractUnavailable: true })
+                        routeTo(window.location.hash, { firstLoad: true, smartContractsUnavailable: true })
                     }).finally(() => {
                         loader(false)
                     })
@@ -204,7 +204,7 @@
                             class="button justify-self-center hidden">Load more</button>
                     </section>
                 </div>
-                <div id="pagination_wrapper" class="flex gap-0-3 align-center"> </div>
+                <div id="pagination_wrapper" class="flex gap-0-3 align-center"></div>
             </div>
             <div id="contacts" class="page flex h-100">
                 <div class="flex direction-column gap-2 h-100">
@@ -1178,7 +1178,7 @@
 
         let tempData
         async function routeTo(targetPage, options = {}) {
-            const { firstLoad, hashChange, smartContractUnavailable = false } = options
+            const { firstLoad, hashChange, smartContractsUnavailable = false } = options
             let pageId
             let params = {}
             let searchParams
@@ -1475,100 +1475,129 @@
                     }
                     break
             }
-            const animOptions = {
-                duration: 100,
-                fill: 'forwards',
-            }
             let previousActiveElement = getRef('main_navbar').querySelector('.nav-item--active')
             const currentActiveElement = document.querySelector(`.nav-item[href="#/${pageId}"]`)
-            if (currentActiveElement) {
-                if (getRef('main_navbar').classList.contains('hidden')) {
-                    getRef('main_navbar').classList.remove('hide-away')
-                    getRef('main_navbar').classList.remove('hidden')
-                    getRef('main_navbar').animate([
-                        {
-                            transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
-                            opacity: 0,
-                        },
-                        {
-                            transform: `none`,
-                            opacity: 1,
-                        },
-                    ], {
-                        duration: 100,
-                        fill: 'forwards',
-                        easing: 'ease'
-                    })
-                }
-                getRef('main_header').classList.remove('hidden')
-                const previousActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(previousActiveElement)
-                const currentActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(currentActiveElement)
-                const isOnTop = previousActiveElementIndex < currentActiveElementIndex
-                const currentIndicator = createElement('div', { className: 'nav-item__indicator' });
-                let previousIndicator = getRef('main_navbar').querySelector('.nav-item__indicator')
-                if (!previousIndicator) {
-                    previousIndicator = currentIndicator.cloneNode(true)
-                    previousActiveElement = currentActiveElement
-                    previousActiveElement.append(previousIndicator)
-                } else if (currentActiveElementIndex !== previousActiveElementIndex) {
-                    const indicatorDimensions = previousIndicator.getBoundingClientRect()
-                    const currentActiveElementDimensions = currentActiveElement.getBoundingClientRect()
-                    let moveBy
-                    if (isMobileView) {
-                        moveBy = ((currentActiveElementDimensions.width - indicatorDimensions.width) / 2) + indicatorDimensions.width
+            if (document.startViewTransition) {
+                document.startViewTransition(() => {
+                    if (previousActiveElement) {
+                        previousActiveElement.classList.remove('nav-item--active');
+                        previousActiveElement.querySelector('.nav-item__indicator')?.remove()
+                    }
+                    if (currentActiveElement) {
+                        if (getRef('main_navbar').classList.contains('hidden')) {
+                            getRef('main_navbar').classList.remove('hide-away')
+                            getRef('main_navbar').classList.remove('hidden')
+                        }
+                        getRef('main_header').classList.remove('hidden')
+                        currentActiveElement.classList.add('nav-item--active')
+                        currentActiveElement.append(createElement('div', { className: 'nav-item__indicator' }));
                     } else {
-                        moveBy = ((currentActiveElementDimensions.height - indicatorDimensions.height) / 2) + indicatorDimensions.height
+                        if (!getRef('main_navbar').classList.contains('hidden')) {
+                            getRef('main_navbar').classList.add('hide-away')
+                            getRef('main_navbar').classList.add('hidden')
+                            getRef('main_header').classList.add('hidden')
+                        }
                     }
-                    indicatorObserver.observe(previousIndicator)
-                    previousIndicator.animate([
-                        {
-                            transform: 'none',
-                            opacity: 1,
-                        },
-                        {
-                            transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `${moveBy}px` : `-${moveBy}px`})`,
-                            opacity: 0,
-                        },
-                    ], { ...animOptions, easing: 'ease-in' }).onfinish = () => {
-                        previousIndicator.remove()
+                    if (pagesData.lastPage !== pageId) {
+                        document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'))
+                        getRef(pageId).classList.remove('hidden')
+                        pagesData.lastPage = pageId
                     }
-                    tempData = {
-                        currentActiveElement,
-                        currentIndicator,
-                        isOnTop,
-                        animOptions,
-                        moveBy
-                    }
-                }
-                previousActiveElement.classList.remove('nav-item--active');
-                currentActiveElement.classList.add('nav-item--active')
+                })
             } else {
-                if (!getRef('main_navbar').classList.contains('hidden')) {
-                    getRef('main_navbar').classList.add('hide-away')
-                    getRef('main_navbar').animate([
-                        {
-                            transform: `none`,
-                            opacity: 1,
-                        },
-                        {
-                            transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
-                            opacity: 0,
-                        },
-                    ], {
-                        duration: 200,
-                        fill: 'forwards',
-                        easing: 'ease'
-                    }).onfinish = () => {
-                        getRef('main_navbar').classList.add('hidden')
-                    }
-                    getRef('main_header').classList.add('hidden')
+                const animOptions = {
+                    duration: 100,
+                    fill: 'forwards',
                 }
-            }
-            if (pagesData.lastPage !== pageId) {
-                document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'))
-                getRef(pageId).classList.remove('hidden')
-                getRef(pageId).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards', easing: 'ease' })
-                pagesData.lastPage = pageId
+                if (currentActiveElement) {
+                    if (getRef('main_navbar').classList.contains('hidden')) {
+                        getRef('main_navbar').classList.remove('hide-away')
+                        getRef('main_navbar').classList.remove('hidden')
+                        getRef('main_navbar').animate([
+                            {
+                                transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
+                                opacity: 0,
+                            },
+                            {
+                                transform: `none`,
+                                opacity: 1,
+                            },
+                        ], {
+                            duration: 100,
+                            fill: 'forwards',
+                            easing: 'ease'
+                        })
+                    }
+                    getRef('main_header').classList.remove('hidden')
+                    const previousActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(previousActiveElement)
+                    const currentActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(currentActiveElement)
+                    const isOnTop = previousActiveElementIndex < currentActiveElementIndex
+                    const currentIndicator = createElement('div', { className: 'nav-item__indicator' });
+                    let previousIndicator = getRef('main_navbar').querySelector('.nav-item__indicator')
+                    if (!previousIndicator) {
+                        previousIndicator = currentIndicator.cloneNode(true)
+                        previousActiveElement = currentActiveElement
+                        previousActiveElement.append(previousIndicator)
+                    } else if (currentActiveElementIndex !== previousActiveElementIndex) {
+                        const indicatorDimensions = previousIndicator.getBoundingClientRect()
+                        const currentActiveElementDimensions = currentActiveElement.getBoundingClientRect()
+                        let moveBy
+                        if (isMobileView) {
+                            moveBy = ((currentActiveElementDimensions.width - indicatorDimensions.width) / 2) + indicatorDimensions.width
+                        } else {
+                            moveBy = ((currentActiveElementDimensions.height - indicatorDimensions.height) / 2) + indicatorDimensions.height
+                        }
+                        indicatorObserver.observe(previousIndicator)
+                        previousIndicator.animate([
+                            {
+                                transform: 'none',
+                                opacity: 1,
+                            },
+                            {
+                                transform: `translate${isMobileView ? 'X' : 'Y'}(${isOnTop ? `${moveBy}px` : `-${moveBy}px`})`,
+                                opacity: 0,
+                            },
+                        ], { ...animOptions, easing: 'ease-in' }).onfinish = () => {
+                            previousIndicator.remove()
+                        }
+                        tempData = {
+                            currentActiveElement,
+                            currentIndicator,
+                            isOnTop,
+                            animOptions,
+                            moveBy
+                        }
+                    }
+                    previousActiveElement.classList.remove('nav-item--active');
+                    currentActiveElement.classList.add('nav-item--active')
+                } else {
+                    if (!getRef('main_navbar').classList.contains('hidden')) {
+                        getRef('main_navbar').classList.add('hide-away')
+                        getRef('main_navbar').animate([
+                            {
+                                transform: `none`,
+                                opacity: 1,
+                            },
+                            {
+                                transform: isMobileView ? `translateY(100%)` : `translateX(-100%)`,
+                                opacity: 0,
+                            },
+                        ], {
+                            duration: 200,
+                            fill: 'forwards',
+                            easing: 'ease'
+                        }).onfinish = () => {
+                            getRef('main_navbar').classList.add('hidden')
+                        }
+                        getRef('main_header').classList.add('hidden')
+                    }
+                }
+                if (pagesData.lastPage !== pageId) {
+                    document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'))
+                    getRef(pageId).classList.remove('hidden')
+                    getRef(pageId).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards', easing: 'ease' })
+                    pagesData.lastPage = pageId
+                }
             }
             document.querySelectorAll('sm-input[data-flo-address]').forEach(input => input.customValidation = floCrypto.validateFloID)
             document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
