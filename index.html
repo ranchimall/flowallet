@@ -1242,7 +1242,12 @@
                                     getRef('smart_contract_creation_form').classList.remove('split-layout')
                                 renderElem(getRef('smart_contract_creation_form'), render.contractCreationForm(type, subtype))
                                 getRef('smart_contract_creation_form').querySelectorAll('[data-flo-address]').forEach(input => {
-                                    input.customValidation = floCrypto.validateFloID
+                                    input.customValidation = (value) => {
+                                        return {
+                                            isValid: floCrypto.validateAddr(value),
+                                            errorText: `Invalid FLO address.<br> It usually starts with "F".`
+                                        }
+                                    }
                                 })
                                 showChildElement('smartcontracts', 1, { entry: slideInLeft, exit: slideOutLeft })
                                 break;
@@ -1599,8 +1604,18 @@
                     pagesData.lastPage = pageId
                 }
             }
-            document.querySelectorAll('sm-input[data-flo-address]').forEach(input => input.customValidation = floCrypto.validateFloID)
-            document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = floCrypto.getPubKeyHex)
+            document.querySelectorAll('sm-input[data-flo-address]').forEach(input => input.customValidation = (value) => {
+                return {
+                    isValid: floCrypto.validateAddr(value),
+                    errorText: `Invalid FLO address.<br> It usually starts with "F"`
+                }
+            })
+            document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = (value) => {
+                return {
+                    isValid: floCrypto.getPubKeyHex(value),
+                    errorText: `Invalid private key.<br> It's a long string of random characters usually starting with 'R'.`
+                }
+            })
         }
 
         const indicatorObserver = new IntersectionObserver(entries => {
@@ -3252,7 +3267,12 @@
             document.getElementById('payee_container').querySelectorAll('.payee-share').forEach((input) => {
                 input.value = parseFloat((100 / document.getElementById('payee_container').querySelectorAll('.payee-share').length).toFixed(2))
             })
-            document.getElementById('payee_container').lastElementChild.querySelector('.payee-address').customValidation = floCrypto.validateFloID
+            document.getElementById('payee_container').lastElementChild.querySelector('.payee-address').customValidation = (value) => {
+                return {
+                    isValid: floCrypto.validateAddr(value),
+                    errorText: `Invalid FLO address.<br> It usually starts with "F".`
+                }
+            }
         }
         function removePayee(e) {
             e.target.closest('li').remove()
