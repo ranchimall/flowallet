@@ -305,7 +305,7 @@
                     </div>
                     <div class="grid gap-1">
                         <sm-input id="get_private_key_field" placeholder="Sender's private key" class="password-field"
-                            type="password" error-text="Invalid private key" data-private-key required autofocus>
+                            type="password" data-private-key required autofocus>
                             <label slot="right" class="interact">
                                 <input type="checkbox" class="hidden" readonly
                                     onchange="togglePrivateKeyVisibility(this)">
@@ -328,7 +328,7 @@
                         <div class="grid gap-1">
                             <div id="tx_receiver_wrapper" class="grid gap-1">
                                 <sm-input id="tx_receiver" class="w-100" placeholder="Receiver's FLO address"
-                                    error-text="Invalid FLO address" data-flo-address="" animate required>
+                                    data-flo-address="" animate required>
                                     <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')"
                                         title="Select from saved IDs">
                                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px"
@@ -652,8 +652,7 @@
             <h3>Add address</h3>
         </header>
         <sm-form>
-            <sm-input id="flo_addr_to_save" placeholder="FLO address" error-text="Invalid FLO address" autofocus
-                data-flo-address animate required>
+            <sm-input id="flo_addr_to_save" placeholder="FLO address" autofocus data-flo-address animate required>
             </sm-input>
             <sm-input id="label_to_save" placeholder="Name" animate></sm-input>
             <button class="button button--primary cta" type="submit" onclick="saveFloId()" disabled>Add</button>
@@ -738,8 +737,8 @@
                     <h5>Recovered FLO address</h5>
                     <sm-copy id="recovered_flo_id"></sm-copy>
                 </div>
-                <sm-input id="retrieve_flo_id_field" type="password" error-text="Invalid private key"
-                    placeholder="Private key" class="password-field" data-private-key required autofocus>
+                <sm-input id="retrieve_flo_id_field" type="password" placeholder="Private key" class="password-field"
+                    data-private-key required autofocus>
                     <label slot="right" class="interact">
                         <input type="checkbox" class="hidden" readonly onchange="togglePrivateKeyVisibility(this)">
                         <svg class="icon invisible" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
@@ -1172,6 +1171,31 @@
             };
         }
 
+        const smCompConfig = {
+            'sm-input': [
+                {
+                    selector: '[data-flo-address]',
+                    customValidation: (value) => {
+                        if (!value) return { isValid: false, errorText: 'Please enter a FLO address' }
+                        return {
+                            isValid: floCrypto.validateAddr(value),
+                            errorText: `Invalid FLO address.<br> It usually starts with "F"`
+                        }
+                    }
+                },
+                {
+                    selector: '[data-private-key]',
+                    customValidation: (value) => {
+                        if (!value) return { isValid: false, errorText: 'Please enter a private key' }
+                        return {
+                            isValid: floCrypto.getPubKeyHex(value),
+                            errorText: `Invalid private key.<br> It's a long string of random characters usually starting with 'R'.`
+                        }
+                    }
+                }
+            ]
+        }
+
         const pagesData = {
             params: {}
         }
@@ -1241,14 +1265,6 @@
                                 else
                                     getRef('smart_contract_creation_form').classList.remove('split-layout')
                                 renderElem(getRef('smart_contract_creation_form'), render.contractCreationForm(type, subtype))
-                                getRef('smart_contract_creation_form').querySelectorAll('[data-flo-address]').forEach(input => {
-                                    input.customValidation = (value) => {
-                                        return {
-                                            isValid: floCrypto.validateAddr(value),
-                                            errorText: `Invalid FLO address.<br> It usually starts with "F".`
-                                        }
-                                    }
-                                })
                                 showChildElement('smartcontracts', 1, { entry: slideInLeft, exit: slideOutLeft })
                                 break;
                             case 'deposit': {
@@ -1283,7 +1299,7 @@
                                                         </div>
                                                         <div class="grid gap-0-5">
                                                             <span class="label">FLO private key</span>
-                                                            <sm-input id="depositor_private_key" class="password-field" type="password" error-text="Invalid private key" data-private-key required>
+                                                            <sm-input id="depositor_private_key" class="password-field" type="password" data-private-key required>
                                                                 <label slot="right" class="interact">
                                                                     <input type="checkbox" class="hidden" readonly onchange="togglePrivateKeyVisibility(this)">
                                                                     <svg class="icon invisible" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <title>Hide password</title> <path d="M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z" fill="none"></path> <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"></path> </svg>
@@ -1345,7 +1361,7 @@
                                                         </div>
                                                         <div class="grid gap-0-5">
                                                             <span class="label">FLO private key</span>
-                                                            <sm-input id="participant_private_key" class="password-field" type="password" error-text="Invalid private key" data-private-key required>
+                                                            <sm-input id="participant_private_key" class="password-field" type="password" data-private-key required>
                                                                 <label slot="right" class="interact">
                                                                     <input type="checkbox" class="hidden" readonly onchange="togglePrivateKeyVisibility(this)">
                                                                     <svg class="icon invisible" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <title>Hide password</title> <path d="M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z" fill="none"></path> <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"></path> </svg>
@@ -1383,7 +1399,7 @@
                                                         </div>
                                                         <div class="grid gap-0-5">
                                                             <span class="label">Oracle FLO private key</span>
-                                                            <sm-input id="oracle_private_key" class="password-field" type="password" error-text="Invalid private key" data-private-key="" required="">
+                                                            <sm-input id="oracle_private_key" class="password-field" type="password" data-private-key="" required="">
                                                                 <label slot="right" class="interact">
                                                                     <input type="checkbox" class="hidden" readonly="" onchange="togglePrivateKeyVisibility(this)">
                                                                     <svg class="icon invisible" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <title>Hide password</title> <path d="M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z" fill="none"></path> <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"></path> </svg>
@@ -1448,7 +1464,7 @@
                                                         </fieldset>
                                                         <div class="grid gap-0-5">
                                                             <span class="label">Committee address FLO private key</span>
-                                                            <sm-input id="trigger_private_key" class="password-field" type="password" error-text="Invalid private key" data-private-key="" required="">
+                                                            <sm-input id="trigger_private_key" class="password-field" type="password" data-private-key="" required="">
                                                                 <label slot="right" class="interact">
                                                                     <input type="checkbox" class="hidden" readonly="" onchange="togglePrivateKeyVisibility(this)">
                                                                     <svg class="icon invisible" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <title>Hide password</title> <path d="M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z" fill="none"></path> <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"></path> </svg>
@@ -1575,24 +1591,7 @@
                 getRef(pageId).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards', easing: 'ease' })
                 pagesData.lastPage = pageId
             }
-            document.querySelectorAll('sm-input[data-flo-address]').forEach(input => input.customValidation = (value) => {
-                return {
-                    isValid: floCrypto.validateAddr(value),
-                    errorText: `Invalid FLO address.<br> It usually starts with "F"`
-                }
-            })
-            document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = (value) => {
-                return {
-                    isValid: floCrypto.getPubKeyHex(value),
-                    errorText: `Invalid private key.<br> It's a long string of random characters usually starting with 'R'.`
-                }
-            })
         }
-
-        const smCompConfig = {
-
-        }
-
         const indicatorObserver = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (!entry.isIntersecting) {
@@ -2029,7 +2028,7 @@
                                                     <span class="label">Payee FLO addresses</span>
                                                     <ul id="payee_container" class="grid gap-1">
                                                         <li class="payee-address-wrapper">
-                                                            <sm-input class="flex w-100 payee-address" placeholder="FLO address" error-text="Invalid FLO address" animate data-flo-address required> </sm-input>
+                                                            <sm-input class="flex w-100 payee-address" placeholder="FLO address" animate data-flo-address required> </sm-input>
                                                             <sm-input class="payee-share" placeholder="Share (%)" value="100" type="number" min="0" max="100" step="0.01" error-text="Share should be between 0-100" animate required> </sm-input>
                                                         </li>
                                                     </ul>
@@ -2099,7 +2098,7 @@
                                         <div class="grid gap-0-5">
                                             <span class="label">FLO private key</span>
                                             <sm-input id="contract_creator_private_key" class="password-field"
-                                                type="password" error-text="Invalid private key" data-private-key required>
+                                                type="password" data-private-key required>
                                                 <label slot="right" class="interact">
                                                     <input type="checkbox" class="hidden" readonly
                                                         onchange="togglePrivateKeyVisibility(this)">
@@ -2356,7 +2355,7 @@
             getRef('tx_flo_amount').classList.remove('hidden')
             renderElem(getRef('tx_receiver_wrapper'), html``)
             renderElem(getRef('tx_receiver_wrapper'), html`
-                                <sm-input id="tx_receiver" class="w-100" placeholder="Receiver's FLO address" error-text="Invalid FLO address" data-flo-address animate required>
+                                <sm-input id="tx_receiver" class="w-100" placeholder="Receiver's FLO address" data-flo-address animate required>
                                     <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')" title="Select from saved IDs">
                                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" /> </svg>
                                     </button>
@@ -2386,7 +2385,7 @@
             const isFirst = getRef('tx_receiver_wrapper').children.length === 0
             getRef('tx_receiver_wrapper').append(html.node`
                 <div class=${`token-receiver-combo ${isFirst ? '' : 'token-receiver-combo--removable'} grid gap-0-5`}>
-                    <sm-input class="token-receiver" class="w-100" placeholder="Receiver's FLO address" error-text="Invalid FLO address" data-flo-address animate required>
+                    <sm-input class="token-receiver" class="w-100" placeholder="Receiver's FLO address" data-flo-address animate required>
                         <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')" title="Select from saved IDs">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" /> </svg>
                         </button>
@@ -3089,7 +3088,7 @@
                     e.target.closest('fieldset').after(html.node`
                                         <div class="grid gap-0-5 oracle-address-wrapper">
                                             <span class="label">Oracle FLO address</span>
-                                            <sm-input id="contract_oracle_address" data-flo-address error-text="Invalid FLO address" required> </sm-input>
+                                            <sm-input id="contract_oracle_address" data-flo-address required> </sm-input>
                                         </div>
                                     `)
                     break;
@@ -3237,7 +3236,7 @@
         function addPayeeAddress() {
             document.getElementById('payee_container').append(html.node`
                                 <li class="payee-address-wrapper">
-                                    <sm-input class="flex w-100 payee-address" placeholder="FLO address" error-text="Invalid FLO address" animate data-flo-address required> </sm-input>
+                                    <sm-input class="flex w-100 payee-address" placeholder="FLO address" animate data-flo-address required> </sm-input>
                                     <sm-input class="payee-share" placeholder="Share (%)" value="100" type="number" min="0" max="100" step="0.01" error-text="Share should be between 0-100" animate required> </sm-input>
                                     <button class="button icon-only" onclick=${removePayee}>
                                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
@@ -3247,12 +3246,6 @@
             document.getElementById('payee_container').querySelectorAll('.payee-share').forEach((input) => {
                 input.value = parseFloat((100 / document.getElementById('payee_container').querySelectorAll('.payee-share').length).toFixed(2))
             })
-            document.getElementById('payee_container').lastElementChild.querySelector('.payee-address').customValidation = (value) => {
-                return {
-                    isValid: floCrypto.validateAddr(value),
-                    errorText: `Invalid FLO address.<br> It usually starts with "F".`
-                }
-            }
         }
         function removePayee(e) {
             e.target.closest('li').remove()
