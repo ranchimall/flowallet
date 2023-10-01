@@ -1589,6 +1589,10 @@
             })
         }
 
+        const smCompConfig = {
+
+        }
+
         const indicatorObserver = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (!entry.isIntersecting) {
@@ -3097,6 +3101,8 @@
             const contractName = document.getElementById('contract_name').value.trim().replace(/\s+/g, '-')
             const creatorPrivateKey = document.getElementById('contract_creator_private_key').value.trim()
             const creatorAddress = floCrypto.getFloID(creatorPrivateKey)
+            if (floGlobals.smartContracts.some(sc => sc.creatorAddress === creatorAddress))
+                return notify(`You already have a smart contract with this address. Only one smart contract is allowed per address.`, 'error')
             let floData
             let confirmationMessage = ''
             if (floGlobals.scMap.has(`${contractName}_${creatorAddress}`))
@@ -3134,6 +3140,8 @@
                                 else
                                     payeeAddressesShare[payeeAddress] = payeeShare
                             })
+                            if (payeeAddressesShare[creatorAddress])
+                                return notify(`Creator address cannot be a payee address`, 'error')
                             // check if payeeAddresses total share is equal to 100 else add remainder
                             const payeeAddressesArray = Object.keys(payeeAddressesShare)
                             const totalShare = payeeAddressesArray.reduce((acc, payeeAddress) => acc + payeeAddressesShare[payeeAddress], 0)

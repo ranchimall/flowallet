@@ -674,6 +674,7 @@ h3 {
 
 .password-field label {
   display: flex;
+  flex-shrink: 0;
 }
 .password-field label input:checked ~ .visible {
   display: none;
