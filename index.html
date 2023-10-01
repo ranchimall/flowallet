@@ -1484,34 +1484,6 @@
             const currentActiveElement = document.querySelector(`.nav-item[href="#/${pageId}"]`)
             const previousActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(previousActiveElement)
             const currentActiveElementIndex = [...getRef('main_navbar').querySelectorAll('.nav-item')].indexOf(currentActiveElement)
-            // if (document.startViewTransition) {
-            //     document.startViewTransition(() => {
-            //         if (previousActiveElement) {
-            //             previousActiveElement.classList.remove('nav-item--active');
-            //             previousActiveElement.querySelector('.nav-item__indicator')?.remove()
-            //         }
-            //         if (currentActiveElement) {
-            //             if (getRef('main_navbar').classList.contains('hidden')) {
-            //                 getRef('main_navbar').classList.remove('hide-away')
-            //                 getRef('main_navbar').classList.remove('hidden')
-            //             }
-            //             getRef('main_header').classList.remove('hidden')
-            //             currentActiveElement.classList.add('nav-item--active')
-            //             currentActiveElement.append(createElement('div', { className: 'nav-item__indicator' }));
-            //         } else {
-            //             if (!getRef('main_navbar').classList.contains('hidden')) {
-            //                 getRef('main_navbar').classList.add('hide-away')
-            //                 getRef('main_navbar').classList.add('hidden')
-            //                 getRef('main_header').classList.add('hidden')
-            //             }
-            //         }
-            //         if (pagesData.lastPage !== pageId) {
-            //             document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'))
-            //             getRef(pageId).classList.remove('hidden')
-            //             pagesData.lastPage = pageId
-            //         }
-            //     })
-            // } else {
             const animOptions = {
                 duration: 100,
                 fill: 'forwards',
@@ -1603,20 +1575,19 @@
                 getRef(pageId).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: 'forwards', easing: 'ease' })
                 pagesData.lastPage = pageId
             }
+            document.querySelectorAll('sm-input[data-flo-address]').forEach(input => input.customValidation = (value) => {
+                return {
+                    isValid: floCrypto.validateAddr(value),
+                    errorText: `Invalid FLO address.<br> It usually starts with "F"`
+                }
+            })
+            document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = (value) => {
+                return {
+                    isValid: floCrypto.getPubKeyHex(value),
+                    errorText: `Invalid private key.<br> It's a long string of random characters usually starting with 'R'.`
+                }
+            })
         }
-        document.querySelectorAll('sm-input[data-flo-address]').forEach(input => input.customValidation = (value) => {
-            return {
-                isValid: floCrypto.validateAddr(value),
-                errorText: `Invalid FLO address.<br> It usually starts with "F"`
-            }
-        })
-        document.querySelectorAll('sm-input[data-private-key]').forEach(input => input.customValidation = (value) => {
-            return {
-                isValid: floCrypto.getPubKeyHex(value),
-                errorText: `Invalid private key.<br> It's a long string of random characters usually starting with 'R'.`
-            }
-        })
-        // }
 
         const indicatorObserver = new IntersectionObserver(entries => {
             entries.forEach(entry => {
@@ -2410,22 +2381,22 @@
             const tokenName = selectedToken.value;
             const isFirst = getRef('tx_receiver_wrapper').children.length === 0
             getRef('tx_receiver_wrapper').append(html.node`
-                                <div class=${`token-receiver-combo ${isFirst ? '' : 'token-receiver-combo--removable'} grid gap-0-5`}>
-                                    <sm-input class="token-receiver" class="w-100" placeholder="Receiver's FLO address" error-text="Invalid FLO address" data-flo-address animate required>
-                                        <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')" title="Select from saved IDs">
-                                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" /> </svg>
-                                        </button>
-                                    </sm-input>
-                                    <sm-input class="token-amount" type="number" placeholder=${`${tokenName.charAt(0).toUpperCase() + tokenName.slice(1)} amount`}
-                                        step="0.00000001" min="0.00000001" error-text="Min. amount is 0.00000001" animate required>
-                                    </sm-input>
-                                    ${!isFirst ? html.node`
-                                        <button class="button icon-only remove-token-receiver" onclick="removeTokenReceiver(this)" title="Remove">
-                                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                                        </button>
-                                    ` : ''}
-                                </div>    
-                            `)
+                <div class=${`token-receiver-combo ${isFirst ? '' : 'token-receiver-combo--removable'} grid gap-0-5`}>
+                    <sm-input class="token-receiver" class="w-100" placeholder="Receiver's FLO address" error-text="Invalid FLO address" data-flo-address animate required>
+                        <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')" title="Select from saved IDs">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" /> </svg>
+                        </button>
+                    </sm-input>
+                    <sm-input class="token-amount" type="number" placeholder=${`${tokenName.charAt(0).toUpperCase() + tokenName.slice(1)} amount`}
+                        step="0.00000001" min="0.00000001" error-text="Min. amount is 0.00000001" animate required>
+                    </sm-input>
+                    ${!isFirst ? html.node`
+                        <button class="button icon-only remove-token-receiver" onclick="removeTokenReceiver(this)" title="Remove">
+                            <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        </button>
+                    ` : ''}
+                </div>    
+            `)
             getRef('send_form').elementsChanged()
         }
         function removeTokenReceiver(elem) {
