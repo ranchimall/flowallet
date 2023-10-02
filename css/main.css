@@ -16,7 +16,7 @@ body {
 
 body {
   --accent-color: #256eff;
-  --text-color: 20, 20, 20;
+  --text-color: 34, 34, 34;
   --background-color: 240, 240, 240;
   --foreground-color: 250, 250, 250;
   --danger-color: rgb(255, 75, 75);
@@ -1369,11 +1369,6 @@ legend,
     gap: 1.5rem;
     margin: auto;
     width: min(36rem, 100%);
-  }
-  #smart_contract_creation_form::part(form).split-layout {
-    grid-template-columns: 1fr 1.5fr;
-    align-items: flex-start;
-    width: min(50rem, 100%);
   }
   .payee-address-wrapper {
     display: grid;
