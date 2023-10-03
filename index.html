@@ -2708,24 +2708,27 @@
                 description = success ? 'This might take upto 30 mins to complete and reflect on blockchain.' : result
 
             renderElem(getRef('transaction_result'), html`
-                                ${success ? html`
-                                    <svg class="icon icon--success" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" /> </svg>
-                                ` : ''}
-                                ${!success ? html`
-                                    <svg class="icon icon--failed" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" /> </svg>
-                                ` : ''}
-                                <h3 id="transaction_result__title">${title}</h3>
-                                <p id="transaction_result__description"> ${description} </p>
-                                ${success && result ? html`
-                                    <div class="grid gap-1">
-                                        <a id="transaction_link" href=${`${floBlockchainAPI.current_server}tx/${result}`} style="margin-top: 1.5rem;" target="_blank">See transaction on blockchain</a>
-                                        <div class="grid">
-                                            <span class="label">Transaction ID</span>
-                                            <sm-copy class="justify-self-center" value=${result}></sm-copy>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            `)
+                ${success ? html`
+                    <svg class="icon icon--success" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" /> </svg>
+                ` : ''}
+                ${!success ? html`
+                    <svg class="icon icon--failed" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" /> </svg>
+                ` : ''}
+                <h3 id="transaction_result__title">${title}</h3>
+                <p id="transaction_result__description"> ${description} </p>
+                ${success && result ? html`
+                    <div class="grid gap-1">
+                        <a id="transaction_link" class="flex align-center button--colored" href=${`${floBlockchainAPI.current_server}tx/${result}`} style="margin-top: 1.5rem;" target="_blank">
+                            See transaction on blockchain
+                            <svg class="icon margin-left-0-5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none"></path> <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path> </svg>
+                        </a>
+                        <div class="grid">
+                            <span class="label">Transaction ID</span>
+                            <sm-copy class="justify-self-center" value=${result}></sm-copy>
+                        </div>
+                    </div>
+                ` : ''}
+            `)
             openPopup('transaction_result_popup')
         }
 
@@ -3215,8 +3218,10 @@
                 floBlockchainAPI.writeData(creatorAddress, floData, creatorPrivateKey, creatorAddress).then((txid) => {
                     showTransactionResult(true, txid, {
                         title: 'Smart contract creation initiated',
-                        description: html`Check details about your smart contract <a href=${`https://ranchimall.github.io/floscout/#/contract/${contractName}-${creatorAddress}`} target="_blank" rel="noopener noreferrer">here</a>.
-                                        <br> It may take some time for the smart contract to be created.`
+                        description: html`
+                            <strong> It may take some time for the smart contract to be created.</strong><br>
+                            <a class="button button--small button--primary" style="margin-top: 0.5rem;" href=${`https://ranchimall.github.io/floscout/#/smart-contracts`} target="_blank" rel="noopener noreferrer">Check out created smart contract</a>
+                        `
                     })
                     getRef('smart_contract_creation_form').reset()
                     document.getElementById('create_contract_button').disabled = true

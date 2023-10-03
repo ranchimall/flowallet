@@ -990,7 +990,7 @@ h3 {
 
 #transaction_result {
   display: grid;
-  gap: 0.5rem;
+  gap: 1.5rem;
   height: max(40vh, 24rem);
   align-items: center;
   justify-content: center;
@@ -1004,7 +1004,7 @@ h3 {
   text-align: center;
   width: 100%;
 }
-#transaction_result .icon {
+#transaction_result > .icon {
   justify-self: center;
   height: 4rem;
   width: 4rem;
@@ -1013,17 +1013,20 @@ h3 {
   -webkit-animation: popup 1s;
           animation: popup 1s;
 }
-#transaction_result .icon--success {
+#transaction_result > .icon--success {
   fill: rgba(var(--background-color), 1);
   padding: 1rem;
   background-color: #0bbe56;
 }
-#transaction_result .icon--failed {
+#transaction_result > .icon--failed {
   background-color: rgba(var(--text-color), 0.03);
   fill: var(--danger-color);
 }
 #transaction_result sm-copy {
   font-size: 0.8rem;
+}
+#transaction_result #transaction_link {
+  justify-self: center;
 }
 
 @-webkit-keyframes popup {
