@@ -23,7 +23,6 @@
         }
     </script>
     <script src="scripts/components.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6" defer></script>
     <script src="scripts/lib.js"></script>
     <script src="scripts/floCrypto.js"></script>
     <script src="scripts/floBlockchainAPI.js"></script>
@@ -652,9 +651,8 @@
             <h3>Add address</h3>
         </header>
         <sm-form>
-            <sm-input id="flo_addr_to_save" placeholder="FLO address" autofocus data-flo-address animate required>
-            </sm-input>
-            <sm-input id="label_to_save" placeholder="Name" animate></sm-input>
+            <sm-input id="label_to_save" placeholder="Name" autofocus animate></sm-input>
+            <sm-input id="flo_addr_to_save" placeholder="FLO address" data-flo-address animate required> </sm-input>
             <button class="button button--primary cta" type="submit" onclick="saveFloId()" disabled>Add</button>
         </sm-form>
     </sm-popup>
@@ -851,7 +849,6 @@
     <script>
         // Global variables
         const { html, render: renderElem } = uhtml;
-        const domRefs = {};
         const currentYear = new Date().getFullYear();
 
         //Checks for internet connection status
@@ -874,25 +871,7 @@
 
         // Use instead of document.getElementById
         function getRef(elementId) {
-            if (!domRefs.hasOwnProperty(elementId)) {
-                domRefs[elementId] = {
-                    count: 1,
-                    ref: null,
-                };
-                return document.getElementById(elementId);
-            } else {
-                if (domRefs[elementId].count < 3) {
-                    domRefs[elementId].count = domRefs[elementId].count + 1;
-                    return document.getElementById(elementId);
-                } else {
-                    if (!domRefs[elementId].ref)
-                        domRefs[elementId].ref = document.getElementById(elementId);
-                    return domRefs[elementId].ref;
-                }
-            }
-        }
-        function $(selector) {
-            return document.querySelector(selector);
+            return document.getElementById(elementId);
         }
 
         // returns dom with specified element
@@ -941,13 +920,9 @@
         document.addEventListener('popupopened', async e => {
             switch (e.target.id) {
                 case 'saved_ids_popup':
-                    const frag = document.createDocumentFragment()
                     const allSavedIds = await getArrayOfSavedIds()
-                    allSavedIds.forEach(({ floID, name }) => {
-                        frag.append(render.savedIdPickerCard(floID, name))
-                    })
-                    getRef('saved_ids_picker_list').innerHTML = ''
-                    getRef('saved_ids_picker_list').append(frag)
+                    const renderedIds = renderContactPickerList(allSavedIds)
+                    renderElem(getRef('saved_ids_picker_list'), html`${renderedIds}`)
                     getRef('search_saved_ids_picker').focusIn()
                     break;
             }
@@ -956,7 +931,7 @@
             zIndex--
             switch (e.target.id) {
                 case 'saved_ids_popup':
-                    getRef('saved_ids_picker_list').innerHTML = ''
+                    renderElem(getRef('saved_ids_picker_list'), html``)
                     getRef('search_saved_ids_picker').value = ''
                     break;
                 case 'transaction_result_popup':
@@ -1855,17 +1830,15 @@
                 }
             },
             savedIdPickerCard(floID, name) {
-                return createElement('li', {
-                    className: 'saved-id grid interact',
-                    attributes: { 'tabindex': '0', 'data-flo-address': floID },
-                    innerHTML: `
-                                                    <div class="saved-id__initial">${name[0]}</div>
-                                                    <div class="grid gap-0-5">
-                                                        <h4 class="saved-id__label">${name}</h4>
-                                                        <div class="saved-id__flo-id overflow-ellipsis">${floID}</div>
-                                                    </div>
-                                                    `
-                })
+                return html`
+                    <li class="saved-id grid interact" tabindex="0" data-flo-address=${floID}>
+                        <div class="saved-id__initial">${name[0]}</div>
+                        <div class="grid gap-0-5">
+                            <h4 class="saved-id__label">${name}</h4>
+                            <div class="saved-id__flo-id overflow-ellipsis">${floID}</div>
+                        </div>
+                    </li>
+                `
             },
             transactionCard(details) {
                 const { sender, receiver, floData, time, txid, netValue, mine } = details
@@ -1936,16 +1909,16 @@
                     for (let i = 1; i <= paginationSegments; i++) {
                         if (i === 1) {
                             pagination.push(html`
-                                                <a href=${`#/search?type=address&query=${address}&page=${i}`} class=${`pagination__item ${i === page ? 'pagination__item--active' : ''}`}>
-                                                    ${i}
-                                                </a> 
-                                            `)
+                                <a href=${`#/search?type=address&query=${address}&page=${i}`} class=${`pagination__item ${i === page ? 'pagination__item--active' : ''}`}>
+                                    ${i}
+                                </a> 
+                            `)
                         } else if (startingPage <= i && i <= showTill) {
                             pagination.push(html`
-                                                <a href=${`#/search?type=address&query=${address}&page=${i}`} class=${`pagination__item ${i === page ? 'pagination__item--active' : ''}`}>
-                                                    ${i}
-                                                </a> 
-                                            `)
+                                <a href=${`#/search?type=address&query=${address}&page=${i}`} class=${`pagination__item ${i === page ? 'pagination__item--active' : ''}`}>
+                                    ${i}
+                                </a> 
+                            `)
                         } else if (i === showTill + 1 && i < paginationSegments) {
                             pagination.push(html` <div class="pagination__item">...</div> `)
                         } else if (i == paginationSegments) {
@@ -1961,9 +1934,9 @@
                     getRef('pagination_wrapper').classList.add('hidden')
                 }
                 /*  if (filteredTransactions && paginationSegments === page && filteredTransactions.length % txsPerPage !== 0 && transactions.length % txsPerPage === 0) {
-                    document.getElementById('load_more_transactions').classList.remove('hidden')
+                    getRef('load_more_transactions').classList.remove('hidden')
                 } else {
-                    document.getElementById('load_more_transactions').classList.add('hidden')
+                    getRef('load_more_transactions').classList.add('hidden')
                 }  */
             },
             availableAssetOptions() {
@@ -1972,154 +1945,141 @@
             availableSmartContractOptions(smartContracts = [], selected) {
                 return smartContracts
                     .map(({ contractName, contractAddress }) => html`
-                                        <sm-option class="breakable" value=${`${contractName}_${contractAddress}`} selected=${`${contractName}_${contractAddress}` === `${selected}`}>${`${replaceDash(contractName)} (${contractAddress})`}</sm-option> 
-                                    `)
+                        <sm-option class="breakable" value=${`${contractName}_${contractAddress}`} selected=${`${contractName}_${contractAddress}` === `${selected}`}>${`${replaceDash(contractName)} (${contractAddress})`}</sm-option> 
+                    `)
             },
             contractCreationForm(type, subtype) {
                 return html`
-                                    ${!type && !subtype ? html`
-                                        <div class="grid gap-1-5">
-                                            <fieldset class="grid gap-0-5">
-                                                <legend>Type</legend>
-                                                <label>
-                                                    <input type="radio" name="contract-type" value="one-time-event" ?checked=${type === 'one-time-event'} ?disabled=${type !== 'one-time-event'}>
-                                                    <span>One time event</span>
-                                                </label>
-                                                <label>
-                                                    <input type="radio" name="contract-type" value="continuous-event" ?checked=${type === 'continuous-event'} ?disabled=${type !== 'continuous-event'}>
-                                                    <span>Continuous event</span>
-                                                </label>
-                                            </fieldset>
-                                            <fieldset class="grid gap-0-5">
-                                                <legend>Subtype</legend>
-                                                <label>
-                                                    <input type="radio" name="contract-subtype" value="time-trigger" ?checked=${subtype === 'time-trigger'} ?disabled=${subtype !== 'time-trigger'}>
-                                                    <span>Time trigger</span>
-                                                </label>
-                                                <label>
-                                                    <input type="radio" name="contract-subtype" value="external-trigger" ?checked=${subtype === 'external-trigger'} ?disabled=${subtype !== 'external-trigger'}>
-                                                    <span>External trigger</span>
-                                                </label>
-                                                <label>
-                                                    <input type="radio" name="contract-subtype" value="tokenswap" ?checked=${subtype === 'tokenswap'} ?disabled=${subtype !== 'tokenswap'}>
-                                                    <span>Token Swap</span>
-                                                </label>
-                                            </fieldset>
-                                        </div>
-                                    ` : ''}
-                                    <div class="grid gap-1-5">
-                                        <div class="grid gap-0-5">
-                                            <span class="label">Contract name</span>
-                                            <sm-input id="contract_name" pattern="^[a-zA-Z0-9 ]+$" error-text="Only alphabet and numbers are allowed" required> </sm-input>
-                                        </div>
-                                        ${type === 'one-time-event' ? html`
-                                            <div class="grid gap-0-5">
-                                                <span class="label">Asset</span>
-                                                <sm-select id="contract_asset">
-                                                    ${render.availableAssetOptions()}
-                                                </sm-select>
-                                            </div>
-                                            ${subtype === 'time-trigger' ? html`
-                                                <div class="grid gap-0-5">
-                                                    <span class="label">Payee FLO addresses</span>
-                                                    <ul id="payee_container" class="grid gap-1">
-                                                        <li class="payee-address-wrapper">
-                                                            <sm-input class="flex w-100 payee-address" placeholder="FLO address" animate data-flo-address required> </sm-input>
-                                                            <sm-input class="payee-share" placeholder="Share (%)" value="100" type="number" min="0" max="100" step="0.01" error-text="Share should be between 0-100" animate required> </sm-input>
-                                                        </li>
-                                                    </ul>
-                                                    <button onclick=${addPayeeAddress} class="margin-right-auto gap-0-5">
-                                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>    
-                                                        Add Address
-                                                    </button>
-                                                </div>
-                                            ` : html`
-                                                <div class="grid gap-0-5">
-                                                    <span class="label">Participant choices</span>
-                                                    <div id="choices_container" class="grid gap-0-3">
-                                                        <sm-input class="user-choice" pattern="^[a-zA-Z0-9 ]+$" placeholder="Choice 1" error-text="Only alphabet and numbers are allowed" required> </sm-input>    
-                                                        <sm-input class="user-choice" pattern="^[a-zA-Z0-9 ]+$" placeholder="Choice 2" error-text="Only alphabet and numbers are allowed" required> </sm-input>    
-                                                    </div>
-                                                    <button onclick=${addChoice} class="margin-right-auto gap-0-5">
-                                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>    
-                                                        Add choice
-                                                    </button>
-                                                </div>
-                                            `}
-                                            <div class="grid gap-0-5">
-                                                <span class="label">Expiration</span>
-                                                <input id="contract_expiration" type="datetime-local" min=${new Date(new Date().getTime() + (5 * 60 * 1000)).toISOString().slice(0, -8)} required>
-                                            </div>
-                                            <div class="grid gap-0-5">
-                                                <span class="label">Participation amount (optional)</span>
-                                                <sm-input id="contract_participation_amount" type="number" step="0.00000001" min="0.00000001"> </sm-input>
-                                            </div>
-                                            <div class="grid gap-0-5">
-                                                <span class="label">Min. subscription amount (optional)</span>
-                                                <sm-input id="contract_min_sub_amount" type="number" step="0.00000001" min="0.00000001"> </sm-input>
-                                            </div>
-                                            <div class="grid gap-0-5">
-                                                <span class="label">Max. subscription amount (optional)</span>
-                                                <sm-input id="contract_max_sub_amount" type="number" step="0.00000001" min="0.00000001"> </sm-input>
-                                            </div>
-                                        ` : html`
-                                            <fieldset class="grid gap-0-5" onchange=${handlePriceTypeChange}>
-                                                <legend>Price type</legend>
-                                                <label class="flex align-center">
-                                                    <input type="radio" name="price-type" value="predetermined" checked>
-                                                    <span>Static</span>
-                                                </label>
-                                                <label class="flex align-center">
-                                                    <input type="radio" name="price-type" value="dynamic">
-                                                    <span>Dynamic</span>
-                                                </label>
-                                            </fieldset>
-                                            <div class="grid gap-0-5">
-                                                <span class="label">Deposit token</span>
-                                                <sm-select id="contract_output_token">
-                                                    ${render.availableAssetOptions()}
-                                                </sm-select>
-                                            </div>
-                                            <div class="grid gap-0-5">
-                                                <span class="label">Participation token</span>
-                                                <sm-select id="contract_input_token">
-                                                    ${render.availableAssetOptions()}
-                                                </sm-select>
-                                            </div>
-                                            <div class="grid gap-0-5">
-                                                <span class="label">Price (1 deposit token = ? participation token)</span>
-                                                <sm-input id="contract_initial_price" type="number" step="0.00000001" min="0.00000001" error-text="The price should be above 0.00000001" required> </sm-input>
-                                            </div>
-                                        `}  
-                                        <div class="grid gap-0-5">
-                                            <span class="label">FLO private key</span>
-                                            <sm-input id="contract_creator_private_key" class="password-field"
-                                                type="password" data-private-key required>
-                                                <label slot="right" class="interact">
-                                                    <input type="checkbox" class="hidden" readonly
-                                                        onchange="togglePrivateKeyVisibility(this)">
-                                                    <svg class="icon invisible" xmlns="http://www.w3.org/2000/svg" height="24px"
-                                                        viewBox="0 0 24 24" width="24px" fill="#000000">
-                                                        <title>Hide password</title>
-                                                        <path d="M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z" fill="none" />
-                                                        <path
-                                                            d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" />
-                                                    </svg>
-                                                    <svg class="icon visible" xmlns="http://www.w3.org/2000/svg" height="24px"
-                                                        viewBox="0 0 24 24" width="24px" fill="#000000">
-                                                        <title>Show password</title>
-                                                        <path d="M0 0h24v24H0z" fill="none" />
-                                                        <path
-                                                            d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                                                    </svg>
-                                                </label>
-                                            </sm-input>
-                                        </div>
-                                        <div class="multi-state-button">
-                                            <button id="create_contract_button" class="button button--primary" onclick=${createSmartContract} type="submit" disabled>Create</button>
-                                        </div>        
+                    ${!type && !subtype ? html`
+                        <div class="grid gap-1-5">
+                            <fieldset class="grid gap-0-5">
+                                <legend>Type</legend>
+                                <label>
+                                    <input type="radio" name="contract-type" value="one-time-event" ?checked=${type === 'one-time-event'} ?disabled=${type !== 'one-time-event'}>
+                                    <span>One time event</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="contract-type" value="continuous-event" ?checked=${type === 'continuous-event'} ?disabled=${type !== 'continuous-event'}>
+                                    <span>Continuous event</span>
+                                </label>
+                            </fieldset>
+                            <fieldset class="grid gap-0-5">
+                                <legend>Subtype</legend>
+                                <label>
+                                    <input type="radio" name="contract-subtype" value="time-trigger" ?checked=${subtype === 'time-trigger'} ?disabled=${subtype !== 'time-trigger'}>
+                                    <span>Time trigger</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="contract-subtype" value="external-trigger" ?checked=${subtype === 'external-trigger'} ?disabled=${subtype !== 'external-trigger'}>
+                                    <span>External trigger</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="contract-subtype" value="tokenswap" ?checked=${subtype === 'tokenswap'} ?disabled=${subtype !== 'tokenswap'}>
+                                    <span>Token Swap</span>
+                                </label>
+                            </fieldset>
+                        </div>
+                    ` : ''}
+                    <div class="grid gap-1-5">
+                        <div class="grid gap-0-5">
+                            <span class="label">Contract name</span>
+                            <sm-input id="contract_name" pattern="^[a-zA-Z0-9 ]+$" error-text="Only alphabet and numbers are allowed" required> </sm-input>
+                        </div>
+                        ${type === 'one-time-event' ? html`
+                            <div class="grid gap-0-5">
+                                <span class="label">Asset</span>
+                                <sm-select id="contract_asset">
+                                    ${render.availableAssetOptions()}
+                                </sm-select>
+                            </div>
+                            ${subtype === 'time-trigger' ? html`
+                                <div class="grid gap-0-5">
+                                    <span class="label">Payee FLO addresses</span>
+                                    <ul id="payee_container" class="grid gap-1">
+                                        <li class="payee-address-wrapper">
+                                            <sm-input class="flex w-100 payee-address" placeholder="FLO address" animate data-flo-address required> </sm-input>
+                                            <sm-input class="payee-share" placeholder="Share (%)" value="100" type="number" min="0" max="100" step="0.01" error-text="Share should be between 0-100" animate required> </sm-input>
+                                        </li>
+                                    </ul>
+                                    <button onclick=${addPayeeAddress} class="margin-right-auto gap-0-5">
+                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>    
+                                        Add Address
+                                    </button>
+                                </div>
+                            ` : html`
+                                <div class="grid gap-0-5">
+                                    <span class="label">Participant choices</span>
+                                    <div id="choices_container" class="grid gap-0-3">
+                                        <sm-input class="user-choice" pattern="^[a-zA-Z0-9 ]+$" placeholder="Choice 1" error-text="Only alphabet and numbers are allowed" required> </sm-input>    
+                                        <sm-input class="user-choice" pattern="^[a-zA-Z0-9 ]+$" placeholder="Choice 2" error-text="Only alphabet and numbers are allowed" required> </sm-input>    
                                     </div>
-                                `
+                                    <button onclick=${addChoice} class="margin-right-auto gap-0-5">
+                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>    
+                                        Add choice
+                                    </button>
+                                </div>
+                            `}
+                            <div class="grid gap-0-5">
+                                <span class="label">Expiration</span>
+                                <input id="contract_expiration" type="datetime-local" min=${new Date(new Date().getTime() + (5 * 60 * 1000)).toISOString().slice(0, -8)} required>
+                            </div>
+                            <div class="grid gap-0-5">
+                                <span class="label">Participation amount (optional)</span>
+                                <sm-input id="contract_participation_amount" type="number" step="0.00000001" min="0.00000001"> </sm-input>
+                            </div>
+                            <div class="grid gap-0-5">
+                                <span class="label">Min. subscription amount (optional)</span>
+                                <sm-input id="contract_min_sub_amount" type="number" step="0.00000001" min="0.00000001"> </sm-input>
+                            </div>
+                            <div class="grid gap-0-5">
+                                <span class="label">Max. subscription amount (optional)</span>
+                                <sm-input id="contract_max_sub_amount" type="number" step="0.00000001" min="0.00000001"> </sm-input>
+                            </div>
+                        ` : html`
+                            <fieldset class="grid gap-0-5" onchange=${handlePriceTypeChange}>
+                                <legend>Price type</legend>
+                                <label class="flex align-center">
+                                    <input type="radio" name="price-type" value="predetermined" checked>
+                                    <span>Static</span>
+                                </label>
+                                <label class="flex align-center">
+                                    <input type="radio" name="price-type" value="dynamic">
+                                    <span>Dynamic</span>
+                                </label>
+                            </fieldset>
+                            <div class="grid gap-0-5">
+                                <span class="label">Deposit token</span>
+                                <sm-select id="contract_output_token">
+                                    ${render.availableAssetOptions()}
+                                </sm-select>
+                            </div>
+                            <div class="grid gap-0-5">
+                                <span class="label">Participation token</span>
+                                <sm-select id="contract_input_token">
+                                    ${render.availableAssetOptions()}
+                                </sm-select>
+                            </div>
+                            <div class="grid gap-0-5">
+                                <span class="label">Price (1 deposit token = ? participation token)</span>
+                                <sm-input id="contract_initial_price" type="number" step="0.00000001" min="0.00000001" error-text="The price should be above 0.00000001" required> </sm-input>
+                            </div>
+                        `}  
+                        <div class="grid gap-0-5">
+                            <span class="label">FLO private key</span>
+                            <sm-input id="contract_creator_private_key" class="password-field"
+                                type="password" data-private-key required>
+                                <label slot="right" class="interact">
+                                    <input type="checkbox" class="hidden" readonly onchange="togglePrivateKeyVisibility(this)">
+                                    <svg class="icon invisible" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <title>Hide password</title> <path d="M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z" fill="none" /> <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" /> </svg>
+                                    <svg class="icon visible" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <title>Show password</title> <path d="M0 0h24v24H0z" fill="none" /> <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" /> </svg>
+                                </label>
+                            </sm-input>
+                        </div>
+                        <div class="multi-state-button">
+                            <button id="create_contract_button" class="button button--primary" onclick=${createSmartContract} type="submit" disabled>Create</button>
+                        </div>        
+                    </div>
+                `
             }
         }
         let transactionsLazyLoader
@@ -2145,8 +2105,8 @@
         })
         delegate(getRef('saved_ids_picker_list'), 'click', '.saved-id', e => {
             const target = e.target.closest('.saved-id');
-            document.getElementById('tx_receiver').value = target.dataset.floAddress
-            document.getElementById('tx_receiver').focusIn()
+            getRef('tx_receiver').value = target.dataset.floAddress
+            getRef('tx_receiver').focusIn()
             closePopup()
             getRef('send_form')._checkValidity()
         })
@@ -2220,20 +2180,22 @@
             }
             return arr.sort((a, b) => a.name.localeCompare(b.name))
         }
+        function renderContactPickerList(contacts = []) {
+            return contacts.map(({ floID, name }) => {
+                return render.savedIdPickerCard(floID, name)
+            })
+        }
 
         getRef('search_saved_ids_picker').addEventListener('input', debounce(async e => {
-            const frag = document.createDocumentFragment()
             const searchKey = e.target.value.trim();
             let allSavedIds = await getArrayOfSavedIds();
             if (searchKey !== '') {
-                const fuse = new Fuse(allSavedIds, { keys: ['floID', 'name'] })
-                allSavedIds = fuse.search(searchKey).map(v => v.item)
+                allSavedIds = allSavedIds.filter(({ floID, name }) => {
+                    return floID.includes(searchKey) || name.toLowerCase().includes(searchKey.toLowerCase())
+                })
             }
-            allSavedIds.forEach(({ floID, name }) => {
-                frag.append(render.savedIdPickerCard(floID, name))
-            })
-            getRef('saved_ids_picker_list').innerHTML = '';
-            getRef('saved_ids_picker_list').append(frag);
+            const renderedContacts = renderContactPickerList(allSavedIds)
+            renderElem(getRef('saved_ids_picker_list'), html`${renderedContacts}`);
             if (searchKey !== '') {
                 const potentialTarget = getRef('saved_ids_picker_list').firstElementChild
                 if (potentialTarget) {
@@ -2321,7 +2283,7 @@
                                             <span>Don't send a token</span>
                                         </label>
                                     `)
-                    renderElem(document.getElementById('sender_tokens_wrapper'), html.for(document.getElementById('sender_tokens_wrapper'), senderFloAddr)`
+                    renderElem(getRef('sender_tokens_wrapper'), html.for(getRef('sender_tokens_wrapper'), senderFloAddr)`
                                         <div class="grid">
                                             <h5>Tokens</h5>
                                             <p>Select a token, if you want to send a token.</p>
@@ -2332,10 +2294,10 @@
                                             </div>
                                         </fieldset>
                                     `)
-                    document.getElementById('sender_tokens_wrapper').classList.remove('hidden')
+                    getRef('sender_tokens_wrapper').classList.remove('hidden')
                     handleTokenSelection()
                 } else {
-                    document.getElementById('sender_tokens_wrapper').classList.add('hidden')
+                    getRef('sender_tokens_wrapper').classList.add('hidden')
                     clearSelection()
                 }
             }).catch((error) => {
@@ -2351,18 +2313,18 @@
             getRef('tx_flo_amount').classList.remove('hidden')
             renderElem(getRef('tx_receiver_wrapper'), html``)
             renderElem(getRef('tx_receiver_wrapper'), html`
-                                <sm-input id="tx_receiver" class="w-100" placeholder="Receiver's FLO address" data-flo-address animate required>
-                                    <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')" title="Select from saved IDs">
-                                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" /> </svg>
-                                    </button>
-                                </sm-input>
-                            `)
+                <sm-input id="tx_receiver" class="w-100" placeholder="Receiver's FLO address" data-flo-address animate required>
+                    <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')" title="Select from saved IDs">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" /> </svg>
+                    </button>
+                </sm-input>
+            `)
             getRef('add_token_receiver').classList.add('hidden')
             floGlobals.sendType = 'flo'
             getRef('send_form').elementsChanged()
         }
         function handleTokenSelection() {
-            const selectedToken = document.getElementById('sender_tokens_wrapper').querySelector('input[type="radio"]:checked')
+            const selectedToken = getRef('sender_tokens_wrapper').querySelector('input[type="radio"]:checked')
             if (selectedToken.value === 'none')
                 return clearSelection(e)
             const tokenName = selectedToken.value
@@ -2376,7 +2338,7 @@
             floGlobals.sendType = 'token'
         }
         function addTokenReceiver() {
-            const selectedToken = document.getElementById('sender_tokens_wrapper').querySelector('input[type="radio"]:checked')
+            const selectedToken = getRef('sender_tokens_wrapper').querySelector('input[type="radio"]:checked')
             const tokenName = selectedToken.value;
             const isFirst = getRef('tx_receiver_wrapper').children.length === 0
             getRef('tx_receiver_wrapper').append(html.node`
@@ -2407,7 +2369,7 @@
             if (rangeUnderflow)
                 e.target.setAttribute('error-text', `Minimum 0.00000001 FLO allowed`)
             if (rangeOverflow)
-                e.target.setAttribute('error-text', `You can send FLO upto ${parseFloat(document.getElementById('sender_balance').textContent) - floGlobals.fee} only`)
+                e.target.setAttribute('error-text', `You can send FLO upto ${parseFloat(getRef('sender_balance').textContent) - floGlobals.fee} only`)
         })
 
         function renderBalance(options = {}) {
@@ -2415,40 +2377,40 @@
             console.log(options)
             getRef('tx_flo_amount').setAttribute('max', balance)
             renderElem(getRef('balance_card'), html`
-                                <div class="grid gap-1">
-                                    <div class="flex align-center space-between">
-                                        <h5>Balance</h5>
-                                        <button id="refresh_balance_button" class="button button--small button--colored hidden"
-                                            onclick="checkSenderBalance()">Refresh</button>
-                                    </div>
-                                    <div class="flex align-end gap-0-3">
-                                        <b id="sender_balance" style="font-size: 2.5rem;line-height: 1;">${showLoader ? html`<sm-spinner></sm-spinner>` : balance}</b>
-                                        <span>FLO</span>
-                                    </div>
-                                    <div class="grid gap-0-3">
-                                        <span class="label">Sender FLO Address</span>
-                                        <h4>${address}</h4>
-                                    </div>
-                                    ${!showLoader && balance == 0 ? html`
-                                        <p style="margin-top: 1.5rem; color: var(--danger-color)">
-                                            You don't have any FLO in your wallet. Please add some FLO to your wallet to send FLO.
-                                        </p>
-                                    ` : ''}
-                                </div>
-                                <div id="sender_tokens_wrapper" class="grid gap-1 hidden"></div>
-                            `)
+                <div class="grid gap-1">
+                    <div class="flex align-center space-between">
+                        <h5>Balance</h5>
+                        <button id="refresh_balance_button" class="button button--small button--colored hidden"
+                            onclick="checkSenderBalance()">Refresh</button>
+                    </div>
+                    <div class="flex align-end gap-0-3">
+                        <b id="sender_balance" style="font-size: 2.5rem;line-height: 1;">${showLoader ? html`<sm-spinner></sm-spinner>` : balance}</b>
+                        <span>FLO</span>
+                    </div>
+                    <div class="grid gap-0-3">
+                        <span class="label">Sender FLO Address</span>
+                        <h4>${address}</h4>
+                    </div>
+                    ${!showLoader && balance == 0 ? html`
+                        <p style="margin-top: 1.5rem; color: var(--danger-color)">
+                            You don't have any FLO in your wallet. Please add some FLO to your wallet to send FLO.
+                        </p>
+                    ` : ''}
+                </div>
+                <div id="sender_tokens_wrapper" class="grid gap-1 hidden"></div>
+            `)
         }
 
         function resetBalance() {
             clearSelection()
             renderElem(getRef('balance_card'), html`
-                                <div class="flex align-center space-between">
-                                    <h5>Balance</h5>
-                                </div>
-                                <p style="line-height: 1.2; opacity: 0.7;">
-                                    Sender balance will be shown once you enter it's private key
-                                </p>
-                            `)
+                <div class="flex align-center space-between">
+                    <h5>Balance</h5>
+                </div>
+                <p style="line-height: 1.2; opacity: 0.7;">
+                    Sender balance will be shown once you enter it's private key
+                </p>
+            `)
         }
 
 
@@ -2564,7 +2526,7 @@
         const txsPerPage = 100;
         async function fetchTransactions(address, page = 1) {
             try {
-                document.getElementById('load_more_transactions').classList.add('hidden')
+                getRef('load_more_transactions').classList.add('hidden')
                 renderElem(getRef('pagination_wrapper'), html``)
                 renderElem(getRef('queried_address_transactions'), html`
                                     <div class="grid gap-1 justify-items-center text-center" style="margin: 3rem 0">
@@ -2628,10 +2590,10 @@
                 const sender = floCrypto.getFloID(privKey)
                 const floAmount = parseFloat(getRef('tx_flo_amount').value.trim());
                 const floData = getRef('flo_data_textarea').value.trim();
-                const selectedToken = document.getElementById('sender_tokens_wrapper').querySelector('input[type="radio"]:checked')
+                const selectedToken = getRef('sender_tokens_wrapper').querySelector('input[type="radio"]:checked')
                 let transactionId
                 if (floGlobals.sendType === 'flo') {
-                    const receiver = document.getElementById('tx_receiver').value.trim();
+                    const receiver = getRef('tx_receiver').value.trim();
                     const consent = await getConfirmation(`Confirm transaction`, {
                         message: ` Sending ${floAmount} FLO to ${receiver} `,
                         confirmText: 'Send',
@@ -2889,17 +2851,17 @@
         }
 
         function handleSmartContractSelection(actionType) {
-            const selectedSmartContract = document.getElementById('selected_smart_contract').value
+            const selectedSmartContract = getRef('selected_smart_contract').value
             const [contractName, contractAddress] = selectedSmartContract.split('_')
             window.location.hash = `#/smartcontracts/${actionType}?scName=${contractName}&scAddress=${contractAddress}`
         }
         function deposit() {
-            const selectedSmartContract = document.getElementById('selected_smart_contract').value
+            const selectedSmartContract = getRef('selected_smart_contract').value
             const [contractName, contractAddress] = (selectedSmartContract).split('_')
             const { contractType, contractSubType, acceptingToken, sellingToken, tokenIdentification } = getScDetails(contractName, contractAddress)
-            const depositAmount = parseFloat(document.getElementById('deposit_amount').value.trim())
-            const depositExpiration = document.getElementById('deposit_expiration').value
-            const depositorPrivateKey = document.getElementById('depositor_private_key').value.trim()
+            const depositAmount = parseFloat(getRef('deposit_amount').value.trim())
+            const depositExpiration = getRef('deposit_expiration').value
+            const depositorPrivateKey = getRef('depositor_private_key').value.trim()
             const depositorAddress = floCrypto.getFloID(depositorPrivateKey)
             const floData = `Deposit ${depositAmount} ${sellingToken}# to ${contractName}@ its FLO address being ${contractAddress}$ with deposit-conditions: (1) expiryTime= ${new Date(depositExpiration).toString()}`
             console.log(floData)
@@ -2920,7 +2882,7 @@
                             description: `If your tokens are not exchanged before the expiry time, you will get them back.`
                         })
                         getRef('smart_contract_deposit_form').reset()
-                        document.getElementById('deposit_button').disabled = true
+                        getRef('deposit_button').disabled = true
                     }).catch(error => {
                         showTransactionResult(false, error)
                         console.error(error)
@@ -2937,11 +2899,11 @@
         }
 
         function participate(e) {
-            const selectedSmartContract = document.getElementById('selected_smart_contract').value
+            const selectedSmartContract = getRef('selected_smart_contract').value
             const [contractName, contractAddress] = (selectedSmartContract).split('_')
-            const participationAmount = parseFloat(document.getElementById('participation_amount').value.trim())
+            const participationAmount = parseFloat(getRef('participation_amount').value.trim())
             const { contractType, contractSubType, acceptingToken, tokenIdentification } = getScDetails(contractName, contractAddress)
-            const participantPrivateKey = document.getElementById('participant_private_key').value.trim()
+            const participantPrivateKey = getRef('participant_private_key').value.trim()
             const participantAddress = floCrypto.getFloID(participantPrivateKey)
             let floData
             let title = 'Participation successful'
@@ -2995,7 +2957,7 @@
                             description
                         })
                         getRef('smart_contract_participate_form').reset()
-                        document.getElementById('participate_button').disabled = true
+                        getRef('participate_button').disabled = true
                     }).catch(error => {
                         showTransactionResult(false, error)
                         console.error(error)
@@ -3011,15 +2973,15 @@
         }
 
         function updatePrice(e) {
-            const selectedSmartContract = document.getElementById('selected_smart_contract').value
+            const selectedSmartContract = getRef('selected_smart_contract').value
             const [contractName, contractAddress] = (selectedSmartContract).split('_')
-            const oraclePrivateKey = document.getElementById('oracle_private_key').value.trim()
-            const oracleAddress = document.getElementById('oracle_address').value
+            const oraclePrivateKey = getRef('oracle_private_key').value.trim()
+            const oracleAddress = getRef('oracle_address').value
             const { acceptingToken } = getScDetails(contractName, contractAddress)
             if (!floCrypto.verifyPrivKey(oraclePrivateKey, oracleAddress)) {
                 return notify(`Private key doesn't match with Oracle address`, 'error')
             }
-            const updatedPrice = parseFloat(document.getElementById('updated_price').value.trim())
+            const updatedPrice = parseFloat(getRef('updated_price').value.trim())
             const floData = ` {"price-update":{"contract-name": "${contractName}", "contract-address": "${contractAddress}", "price": ${updatedPrice}}} `
             console.log(floData)
             getConfirmation('Update price', {
@@ -3034,7 +2996,7 @@
                         title: 'Price update initiated',
                     })
                     getRef('smart_contract_update_form').reset()
-                    document.getElementById('update_price_button').disabled = true
+                    getRef('update_price_button').disabled = true
                 }).catch((error) => {
                     showTransactionResult(false, error)
                     console.error(error)
@@ -3045,9 +3007,9 @@
         }
 
         function triggerContract(e) {
-            const selectedSmartContract = document.getElementById('selected_smart_contract').value
+            const selectedSmartContract = getRef('selected_smart_contract').value
             const [contractName, contractAddress] = (selectedSmartContract).split('_')
-            const triggerPrivateKey = document.getElementById('trigger_private_key').value.trim()
+            const triggerPrivateKey = getRef('trigger_private_key').value.trim()
             const triggerAddress = floCrypto.getFloID(triggerPrivateKey)
             const triggerOutcome = getRef('smart_contract_trigger_form').querySelector('input[name="outcome"]:checked').value
             const floData = `${contractName}@ triggerCondition:"${triggerOutcome}"`
@@ -3067,7 +3029,7 @@
                         title: 'Contract trigger initiated',
                     })
                     getRef('smart_contract_trigger_form').reset()
-                    document.getElementById('trigger_contract_button').disabled = true
+                    getRef('trigger_contract_button').disabled = true
                 }).catch((error) => {
                     showTransactionResult(false, error)
                     console.error(error)
@@ -3096,8 +3058,8 @@
 
         async function createSmartContract() {
             const { type, subtype } = pagesData.params
-            const contractName = document.getElementById('contract_name').value.trim().replace(/\s+/g, '-')
-            const creatorPrivateKey = document.getElementById('contract_creator_private_key').value.trim()
+            const contractName = getRef('contract_name').value.trim().replace(/\s+/g, '-')
+            const creatorPrivateKey = getRef('contract_creator_private_key').value.trim()
             const creatorAddress = floCrypto.getFloID(creatorPrivateKey)
             if (floGlobals.smartContracts.some(sc => sc.contractAddress === creatorAddress))
                 return notify(`You already have a smart contract with this address. Only one smart contract is allowed per address.`, 'error')
@@ -3107,14 +3069,14 @@
                 return notify(`Contract with name: ${contractName} and address: ${creatorAddress} already exists`, 'error')
             switch (type) {
                 case 'one-time-event':
-                    const contractAsset = document.getElementById('contract_asset').value;
-                    const contractExpiration = document.getElementById('contract_expiration').value;
+                    const contractAsset = getRef('contract_asset').value;
+                    const contractExpiration = getRef('contract_expiration').value;
                     if (new Date(contractExpiration) < new Date()) {
                         return notify(`Contract expiration datetime cannot be in the past`, 'error')
                     }
-                    const contractParticipationAmount = parseFloat(document.getElementById('contract_participation_amount').value.trim()) || 0;
-                    const contractMinSubAmount = parseFloat(document.getElementById('contract_min_sub_amount').value.trim());
-                    const contractMaxSubAmount = parseFloat(document.getElementById('contract_max_sub_amount').value.trim());
+                    const contractParticipationAmount = parseFloat(getRef('contract_participation_amount').value.trim()) || 0;
+                    const contractMinSubAmount = parseFloat(getRef('contract_min_sub_amount').value.trim());
+                    const contractMaxSubAmount = parseFloat(getRef('contract_max_sub_amount').value.trim());
                     if (contractMinSubAmount && contractMaxSubAmount && contractMinSubAmount > contractMaxSubAmount) {
                         return notify(`Contract minimum subscription amount cannot be greater than maximum subscription amount`, 'error')
                     }
@@ -3154,7 +3116,7 @@
                                 const remainder = 100 - totalShare
                                 const lastPayeeAddress = payeeAddressesArray[payeeAddressesArray.length - 1]
                                 payeeAddressesShare[lastPayeeAddress] += remainder
-                                const lastPayeeInput = document.getElementById('payee_container').lastElementChild.querySelector('.payee-share')
+                                const lastPayeeInput = getRef('payee_container').lastElementChild.querySelector('.payee-share')
                                 if (lastPayeeInput) {
                                     lastPayeeInput.value = payeeAddressesShare[lastPayeeAddress]
                                     lastPayeeInput.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -3194,13 +3156,13 @@
                     switch (subtype) {
                         case 'tokenswap': {
                             const priceType = document.querySelector('input[name="price-type"]:checked').value
-                            const participationToken = document.getElementById('contract_input_token').value
-                            const depositToken = document.getElementById('contract_output_token').value
+                            const participationToken = getRef('contract_input_token').value
+                            const depositToken = getRef('contract_output_token').value
                             if (participationToken === depositToken) return notify(`Participation and deposit token cannot be same`, 'error')
-                            const initialPrice = parseFloat(document.getElementById('contract_initial_price').value.trim()) || 0;
+                            const initialPrice = parseFloat(getRef('contract_initial_price').value.trim()) || 0;
                             let oracleAddress
                             if (priceType === 'dynamic')
-                                oracleAddress = document.getElementById('contract_oracle_address').value.trim()
+                                oracleAddress = getRef('contract_oracle_address').value.trim()
                             floData = `Create Smart Contract with the name ${contractName}@ of the type continuous-event* at the address ${creatorAddress}$ with contract-conditions : (1) subtype = tokenswap (2) accepting_token = ${participationToken}# (3) selling_token = ${depositToken}# (4) price = '${initialPrice}' (5) priceType = ${priceType} ${oracleAddress ? `(6) oracle_address = ${oracleAddress}` : ''} end-contract-conditions`
                             confirmationMessage = `Name: ${contractName} \nType: Continuous event \nSubtype: Token swap \nDeposit token: ${depositToken} \nParticipation token: ${participationToken}  \nInitial price: ${initialPrice} ${participationToken} per ${depositToken} \nPrice type: ${priceType} ${oracleAddress ? `\nOracle address: ${oracleAddress}` : ''}`
                         } break;
@@ -3224,7 +3186,7 @@
                         `
                     })
                     getRef('smart_contract_creation_form').reset()
-                    document.getElementById('create_contract_button').disabled = true
+                    getRef('create_contract_button').disabled = true
                 }).catch((error) => {
                     showTransactionResult(false, error)
                     console.error(error)
@@ -3235,7 +3197,7 @@
         }
 
         function addPayeeAddress() {
-            document.getElementById('payee_container').append(html.node`
+            getRef('payee_container').append(html.node`
                                 <li class="payee-address-wrapper">
                                     <sm-input class="flex w-100 payee-address" placeholder="FLO address" animate data-flo-address required> </sm-input>
                                     <sm-input class="payee-share" placeholder="Share (%)" value="100" type="number" min="0" max="100" step="0.01" error-text="Share should be between 0-100" animate required> </sm-input>
@@ -3244,20 +3206,20 @@
                                     </button>        
                                 </li>
                             `)
-            document.getElementById('payee_container').querySelectorAll('.payee-share').forEach((input) => {
-                input.value = parseFloat((100 / document.getElementById('payee_container').querySelectorAll('.payee-share').length).toFixed(2))
+            getRef('payee_container').querySelectorAll('.payee-share').forEach((input) => {
+                input.value = parseFloat((100 / getRef('payee_container').querySelectorAll('.payee-share').length).toFixed(2))
             })
         }
         function removePayee(e) {
             e.target.closest('li').remove()
-            document.getElementById('payee_container').querySelectorAll('.payee-share').forEach((input) => {
-                input.value = parseFloat((100 / document.getElementById('payee_container').querySelectorAll('.payee-share').length).toFixed(2))
+            getRef('payee_container').querySelectorAll('.payee-share').forEach((input) => {
+                input.value = parseFloat((100 / getRef('payee_container').querySelectorAll('.payee-share').length).toFixed(2))
             })
         }
 
         function addChoice(e) {
-            const choiceNo = document.getElementById('choices_container').children.length + 1
-            document.getElementById('choices_container').append(html.node`
+            const choiceNo = getRef('choices_container').children.length + 1
+            getRef('choices_container').append(html.node`
                                 <div class="choice-wrapper">
                                     <sm-input class="user-choice" pattern="^[a-zA-Z0-9 ]+$" placeholder=${`Choice ${choiceNo}`} error-text="Only alphabet and numbers are allowed" required> </sm-input>  
                                     <button class="button icon-only" onclick=${removeChoice}>
@@ -3268,7 +3230,7 @@
         }
         function removeChoice(e) {
             e.target.closest('.choice-wrapper').remove()
-            document.getElementById('choices_container').querySelectorAll('.user-choice').forEach((input, index) => {
+            getRef('choices_container').querySelectorAll('.user-choice').forEach((input, index) => {
                 input.placeholder = `Choice ${index + 1}`
             })
         }
