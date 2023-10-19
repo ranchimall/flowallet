@@ -22,7 +22,7 @@
             expirationDays: 60,
         }
     </script>
-    <script src="scripts/components.js" defer></script>
+    <script src="scripts/components.js"></script>
     <script src="scripts/lib.js"></script>
     <script src="scripts/floCrypto.js"></script>
     <script src="scripts/floBlockchainAPI.js"></script>
@@ -2642,6 +2642,7 @@
                             });
                         } else {
                             const floData = `send ${bulkTokenReceivers[tokenReceivers[0]]} ${selectedToken.value}#`
+                            if (await hasUnconfirmedTransactions(sender)) return
                             transactionId = await floBlockchainAPI.writeData(sender, floData, privKey, tokenReceivers[0])
                             showTransactionResult(true, transactionId);
                         }
@@ -2764,6 +2765,21 @@
             '--redish-orange',
         ]
 
+        function hasUnconfirmedTransactions(address) {
+            return new Promise((resolve, reject) => {
+                fetchJson(`https://blockbook.ranchimall.net/api/v2/address/${address}?details=basic`)
+                    .then(details => {
+                        resolve(details.unconfirmedTxs > 0)
+                        if (details.unconfirmedTxs > 0) {
+                            notify(`You have ${details.unconfirmedTxs} unconfirmed transactions. Please wait for them to confirm before initiating another transaction.`, 'error')
+                        }
+                    }).catch(error => {
+                        reject(error)
+                        console.error(error)
+                    })
+            })
+        }
+
         async function getContractInfo(name, address) {
             return new Promise((resolve, reject) => {
                 if (!name) {
@@ -2874,8 +2890,9 @@
                 getConfirmation('Deposit', {
                     message: `Are you sure you want to deposit ${depositAmount} ${sellingToken} in ${contractName}?`,
                     confirmText: 'Deposit',
-                }).then(res => {
-                    if (!res) return
+                }).then(async res => {
+                    if (!res) return;
+                    if (await hasUnconfirmedTransactions(depositorAddress)) return
                     floBlockchainAPI.sendTx(depositorAddress, contractAddress, floGlobals.sendAmt, depositorPrivateKey, floData).then(txid => {
                         showTransactionResult(true, txid, {
                             title: `${sellingToken} tokens deposited`,
@@ -2949,8 +2966,10 @@
                 getConfirmation('Participate', {
                     message: `Are you sure you want to participate in ${contractName} with ${participationAmount} ${acceptingToken || tokenIdentification}?`,
                     confirmText: 'Participate',
-                }).then(res => {
+                }).then(async res => {
                     if (!res) return
+                    if (await hasUnconfirmedTransactions(participantAddress)) return
+
                     floBlockchainAPI.sendTx(participantAddress, contractAddress, floGlobals.sendAmt, participantPrivateKey, floData).then(txid => {
                         showTransactionResult(true, txid, {
                             title,
@@ -2988,9 +3007,10 @@
                 message: `Are you sure you want to update the price of ${contractName} to ${updatedPrice} ${acceptingToken}?`,
                 confirmText: 'Update',
                 cancelText: 'Cancel'
-            }).then((res) => {
+            }).then(async (res) => {
                 if (!res) return
                 buttonLoader(e.target.closest('button'), true)
+                if (await hasUnconfirmedTransactions(oracleAddress)) return
                 floBlockchainAPI.writeData(oracleAddress, floData, oraclePrivateKey, contractAddress).then((txid) => {
                     showTransactionResult(true, txid, {
                         title: 'Price update initiated',
@@ -3021,9 +3041,10 @@
                 message: `Triggering ${contractName} with outcome: ${triggerOutcome}`,
                 confirmText: 'Trigger',
                 cancelText: 'Cancel'
-            }).then((res) => {
+            }).then(async (res) => {
                 if (!res) return
                 buttonLoader('trigger_contract_button', true)
+                if (await hasUnconfirmedTransactions(triggerAddress)) return
                 floBlockchainAPI.writeData(triggerAddress, floData, triggerPrivateKey, contractAddress).then((txid) => {
                     showTransactionResult(true, txid, {
                         title: 'Contract trigger initiated',
@@ -3174,9 +3195,10 @@
                 message: `Are you sure you want to create a smart contract with the following details? \n\n${confirmationMessage}`,
                 confirmText: 'Create',
                 cancelText: 'Cancel'
-            }).then((res) => {
+            }).then(async (res) => {
                 if (!res) return
                 buttonLoader('create_contract_button', true)
+                if (await hasUnconfirmedTransactions(creatorAddress)) return
                 floBlockchainAPI.writeData(creatorAddress, floData, creatorPrivateKey, creatorAddress).then((txid) => {
                     showTransactionResult(true, txid, {
                         title: 'Smart contract creation initiated',
