@@ -22,7 +22,7 @@
             expirationDays: 60,
         }
     </script>
-    <script src="scripts/components.js"></script>
+    <script src="scripts/components.min.js"></script>
     <script src="scripts/lib.js"></script>
     <script src="scripts/floCrypto.js"></script>
     <script src="scripts/floBlockchainAPI.js"></script>
@@ -328,7 +328,7 @@
                             <div id="tx_receiver_wrapper" class="grid gap-1">
                                 <sm-input id="tx_receiver" class="w-100" placeholder="Receiver's FLO address"
                                     data-flo-address="" animate required>
-                                    <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')"
+                                    <button slot="right" class="icon-only" onclick="openAddressSelector(event)"
                                         title="Select from saved IDs">
                                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px"
                                             viewBox="0 0 24 24" width="24px" fill="#000000">
@@ -933,6 +933,7 @@
                 case 'saved_ids_popup':
                     renderElem(getRef('saved_ids_picker_list'), html``)
                     getRef('search_saved_ids_picker').value = ''
+                    floGlobals.addressSelectorTarget = null
                     break;
                 case 'transaction_result_popup':
                     renderElem(getRef('transaction_result'), html``)
@@ -1146,14 +1147,14 @@
             };
         }
 
-        const smCompConfig = {
+        window.smCompConfig = {
             'sm-input': [
                 {
                     selector: '[data-flo-address]',
                     customValidation: (value) => {
                         if (!value) return { isValid: false, errorText: 'Please enter a FLO address' }
                         return {
-                            isValid: floCrypto.validateAddr(value),
+                            isValid: floCrypto.validateFloID(value),
                             errorText: `Invalid FLO address.<br> It usually starts with "F"`
                         }
                     }
@@ -2104,9 +2105,9 @@
             }
         })
         delegate(getRef('saved_ids_picker_list'), 'click', '.saved-id', e => {
-            const target = e.target.closest('.saved-id');
-            getRef('tx_receiver').value = target.dataset.floAddress
-            getRef('tx_receiver').focusIn()
+            if (!floGlobals.addressSelectorTarget) return;
+            floGlobals.addressSelectorTarget.value = e.delegateTarget.dataset.floAddress
+            floGlobals.addressSelectorTarget.focusIn()
             closePopup()
             getRef('send_form')._checkValidity()
         })
@@ -2305,6 +2306,10 @@
                 resetBalance()
             })
         }
+        function openAddressSelector(e) {
+            floGlobals.addressSelectorTarget = e.target.closest('sm-input')
+            openPopup('saved_ids_popup')
+        }
         floGlobals.sendType = 'flo'
         function clearSelection() {
             getRef('flo_data_wrapper').classList.remove('hidden')
@@ -2314,7 +2319,7 @@
             renderElem(getRef('tx_receiver_wrapper'), html``)
             renderElem(getRef('tx_receiver_wrapper'), html`
                 <sm-input id="tx_receiver" class="w-100" placeholder="Receiver's FLO address" data-flo-address animate required>
-                    <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')" title="Select from saved IDs">
+                    <button slot="right" class="icon-only" onclick=${openAddressSelector} title="Select from saved IDs">
                         <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" /> </svg>
                     </button>
                 </sm-input>
@@ -2326,7 +2331,7 @@
         function handleTokenSelection() {
             const selectedToken = getRef('sender_tokens_wrapper').querySelector('input[type="radio"]:checked')
             if (selectedToken.value === 'none')
-                return clearSelection(e)
+                return clearSelection()
             const tokenName = selectedToken.value
             const tokenBalance = parseFloat(selectedToken.dataset.balance)
             getRef('flo_data_wrapper').classList.add('hidden')
@@ -2341,27 +2346,24 @@
             const selectedToken = getRef('sender_tokens_wrapper').querySelector('input[type="radio"]:checked')
             const tokenName = selectedToken.value;
             const isFirst = getRef('tx_receiver_wrapper').children.length === 0
-            getRef('tx_receiver_wrapper').append(html.node`
+            getRef('tx_receiver_wrapper').append(html.node/*html*/`
                 <div class=${`token-receiver-combo ${isFirst ? '' : 'token-receiver-combo--removable'} grid gap-0-5`}>
                     <sm-input class="token-receiver" class="w-100" placeholder="Receiver's FLO address" data-flo-address animate required>
-                        <button slot="right" class="icon-only" onclick="openPopup('saved_ids_popup')" title="Select from saved IDs">
+                        <button slot="right" class="icon-only" onclick=${openAddressSelector} title="Select from saved IDs">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"> <path d="M0 0h24v24H0z" fill="none" /> <path d="M21 5v14h2V5h-2zm-4 14h2V5h-2v14zM14 5H2c-.55 0-1 .45-1 1v12c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1zM8 7.75c1.24 0 2.25 1.01 2.25 2.25S9.24 12.25 8 12.25 5.75 11.24 5.75 10 6.76 7.75 8 7.75zM12.5 17h-9v-.75c0-1.5 3-2.25 4.5-2.25s4.5.75 4.5 2.25V17z" /> </svg>
                         </button>
                     </sm-input>
                     <sm-input class="token-amount" type="number" placeholder=${`${tokenName.charAt(0).toUpperCase() + tokenName.slice(1)} amount`}
                         step="0.00000001" min="0.00000001" error-text="Min. amount is 0.00000001" animate required>
                     </sm-input>
-                    ${!isFirst ? html.node`
-                        <button class="button icon-only remove-token-receiver" onclick="removeTokenReceiver(this)" title="Remove">
+                    ${!isFirst ? html.node/*html*/`
+                        <button class="button icon-only remove-token-receiver" onclick=${(e) => e.target.closest('.token-receiver-combo').remove()} title="Remove">
                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                         </button>
                     ` : ''}
                 </div>    
             `)
             getRef('send_form').elementsChanged()
-        }
-        function removeTokenReceiver(elem) {
-            elem.closest('.grid').remove()
         }
         getRef('tx_flo_amount').addEventListener('input', e => {
             const floAmount = parseFloat(e.target.value.trim())
